@@ -39,7 +39,7 @@ const NewGoal = () => {
   });
 
  return (
-     <section className="flex flex-col gap-y-8 sm:gap-y-12">
+     <section className="flex flex-col gap-y-8 sm:gap-y-12 pt-24">
        <header className="text-center px-4">
          <h2 className="text-2xl sm:text-4xl font-bold text-balance pb-2 sm:pb-4">What do you want to learn?</h2>
          <p className="text-base sm:text-xl text-muted-foreground text-balance">

@@ -2,12 +2,12 @@ import { BookOpen, Play, FileText, Code, Star } from 'lucide-react'
 
 interface ResourcesProps {
   resources: Array<{
-    id: number
-    title: string
+    id: number;
+    title: string;
     type: 'course' | 'video' | 'documentation' | 'project'
-    duration: string
-    level: string
-    rating: number
+    duration: string;
+    level: string;
+    rating: number;
   }>
 }
 
