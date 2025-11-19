@@ -1,3 +1,7 @@
+import NewGoal from "./pages/NewGoal";
+
 export default function App() {
-  return <main>Hello world</main>
+  return <main className="pt-16">
+    <NewGoal />
+  </main>
 }
