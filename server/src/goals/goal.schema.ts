@@ -18,7 +18,7 @@ const optionSchema = z.object({
     id: z.string().describe("A unique UUID for the sub-topic."),
     title: z.string().describe("The title of the sub-topic (e.g., 'React')."),
     type: z.enum(["core", "optional"]).describe("Whether the sub-topic is essential (core) or supplementary (optional)."),
-    completed: z.boolean().describe("Initial state is false."),
+    status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A brief explanation of what the sub-topic covers."),
     resources: z.array(resourceSchema).describe("A list of links or materials for this sub-topic."),
     // Note: options array is intentionally omitted here to prevent infinite recursion
@@ -28,7 +28,7 @@ const topicSchema = z.object({
     id: z.string().describe("A unique UUID for the topic."),
     title: z.string().describe("The title of the topic (e.g., 'Javascript')."),
     type: z.enum(["core", "optional"]).describe("Whether the topic is essential (core) or supplementary (optional)."),
-    completed: z.boolean().describe("Initial state is false."),
+    status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A brief explanation of what the topic covers."),
     resources: z.array(resourceSchema).describe("A list of recommended materials for this topic."),
     options: z.array(optionSchema).describe("Alternative or more specialized options, concepts, paths or tools.").optional(),
@@ -51,7 +51,7 @@ const checkpointSchema = z.object({
 const extraSchema = z.object({
     id: z.string().describe("A unique UUID for the extra item."),
     title: z.string().describe("Title of the extra topic (e.g., 'Web Performance')."),
-    completed: z.boolean().describe("Initial state is false."),
+    status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("Explanation of the extra topic."),
     resources: z.array(resourceSchema).describe("Materials for the extra topic."),
     options: z.array(optionSchema).describe("Any alternative sub-paths for the extra topic (eg., 'Vitest' in this case)"),

@@ -6,6 +6,7 @@ config({ path: ".env.local" });
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
   PORT: z.coerce.number().default(6000),
+  DATABASE_URL: z.url(),
   GEMINI_API_KEY: z.string(),
 });
 
