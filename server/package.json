@@ -15,6 +15,14 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/express": "^5.0.5",
     "@types/node": "^24.10.1"
+  },
+  "dependencies": {
+    "@google/genai": "^1.30.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "zod": "^4.1.12",
+    "zod-to-json-schema": "^3.25.0"
   }
 }
