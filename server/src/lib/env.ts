@@ -7,6 +7,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
   PORT: z.coerce.number().default(6000),
   DATABASE_URL: z.url(),
+  RESEND_API_KEY: z.string(),
+  EMAIL_FROM: z.string(),
   GEMINI_API_KEY: z.string(),
 });
 
