@@ -1,6 +1,7 @@
+import Dashboard from "@/pages/dashboard";
+import NewGoal from "@/pages/new-goal";
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "./pages/dashboard";
-import NewGoal from "./pages/new-goal";
+import LoginPage from "./pages/auth/login";
 
 export default function App() {
   return (
@@ -8,6 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/new" element={<NewGoal />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </>
   );

@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import GoalPreview from "./GoalPreview";
+import { Link } from "react-router-dom";
 
 const goals = [{
   id: 1,
@@ -17,12 +18,14 @@ const Dashboard = () => {
                    <h2 className="text-2xl sm:text-3xl font-bold text-balance">Your Learning Goals</h2>
                    <p className="text-sm sm:text-base text-muted-foreground mt-1">{goals.length} active goal{goals.length !== 1 ? 's' : ''}</p>
                  </div>
-                 <button
-                   className="bg-linear-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 text-primary-foreground font-semibold flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto"
-                 >
-                   <Plus className="w-5 h-5" />
-                   New Goal
-                 </button>
+                   <Link to={"/new"}>
+                     <button
+                       className="bg-linear-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 text-primary-foreground font-semibold flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto"
+                     >
+                       <Plus className="w-5 h-5" />
+                       New Goal
+                     </button>
+                   </Link>
                </div>
 
                {goals.length === 0 ? (

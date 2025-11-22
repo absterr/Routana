@@ -1,10 +1,13 @@
+import { createNewGoal } from "@/lib/goals/goals-api";
+import { newGoalSchema } from "@/lib/goals/goals-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z, object, string } from "zod";
+import { z } from "zod";
 
 type Field = {
-  name: keyof z.infer<typeof goalSchema>;
+  name: keyof z.infer<typeof newGoalSchema>;
   label: string;
   placeholder?: string;
   type: "text" | "textarea" | "select";
@@ -13,24 +16,19 @@ type Field = {
 
 const fields: Field[] = [
   { name: "title", label: "Learning Goal", placeholder: "e.g., Become a Frontend Developer", type: "text" },
-  { name: "description", label: "Tell us more (optional)", placeholder: "Share any relevant experience...", type: "textarea" },
+  { name: "description", label: "Tell us more (optional)", placeholder: "Share any relevant preference/experience...", type: "textarea" },
   {
     name: "timeframe",
     label: "Timeline",
     type: "select",
-    options: ["1-week","2-weeks","1-month","3-months","6-months","1-year","Flexible"],
+    options: ["1-month", "3-months", "6-months", "1-year", "Flexible"],
   },
 ];
 
-const goalSchema = object({
-  title: string().min(3, "Goal title is required").max(60, "Goal title length exceeded"),
-  description: string().max(230, "Goal description length exceeded").optional(),
-  timeframe: z.enum(["1-month", "3-months", "6-months", "1-year", "Flexible"])
-});
 
 const NewGoal = () => {
-  const form = useForm<z.infer<typeof goalSchema>>({
-    resolver: zodResolver(goalSchema),
+  const form = useForm<z.infer<typeof newGoalSchema>>({
+    resolver: zodResolver(newGoalSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -38,17 +36,28 @@ const NewGoal = () => {
     }
   });
 
+  const { isPending, mutate } = useMutation({
+    mutationFn: createNewGoal,
+    onSuccess: () => console.log("Roadmap created"),
+    onError: (err) => console.log("Couldn't create roadmap", err)
+  });
+
+
+  const onSubmit = (values: z.infer<typeof newGoalSchema>) => {
+    mutate(values);
+  }
+
  return (
      <section className="flex flex-col gap-y-8 sm:gap-y-12 pt-24">
        <header className="text-center px-4">
          <h2 className="text-2xl sm:text-4xl font-bold text-balance pb-2 sm:pb-4">What do you want to learn?</h2>
          <p className="text-base sm:text-xl text-muted-foreground text-balance">
-           Tell us your learning goal and we'll create a personalized roadmap powered by AI
+           Tell us your learning goal and we'll create a personalized roadmap just for you
          </p>
        </header>
 
        <div className="max-w-2xl mx-auto px-4 sm:px-0">
-         <form className="flex flex-col gap-y-4 sm:gap-y-6">
+         <form className="flex flex-col gap-y-4 sm:gap-y-6" onSubmit={form.handleSubmit(onSubmit)}>
            {fields.map((field) => (
                <div key={field.name} className="flex flex-col gap-y-1">
                  <div className="flex justify-between pb-2">
@@ -95,8 +104,9 @@ const NewGoal = () => {
              <button
                type="submit"
                className="w-full bg-linear-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 text-primary-foreground font-semibold py-2.5 sm:py-3 rounded-lg flex items-center justify-center gap-2 text-sm sm:text-base"
+               disabled={isPending}
              >
-               Generate Roadmap
+               {isPending ? "Generating..." : "Generate Roadmap"}
                <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" />
              </button>
            </div>
