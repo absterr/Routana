@@ -1,12 +1,12 @@
 import { Chrome } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const LoginPage = () => {
+const SignupPage = () => {
   return (
     <div className="min-h-screen bg-linear-to-br  from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center pb-8">
           <svg
             width="40"
             height="40"
@@ -22,7 +22,10 @@ const LoginPage = () => {
           </svg>
         </div>
         {/* Heading */}
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center mb-8">Welcome back</h1>
+        <header className="text-center pb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-2">Create your account</h1>
+          <p className="text-gray-500 text-sm">Get personalized roadmaps, progress tracking, and curated resources.</p>
+        </header>
 
         {/* Google Button */}
         <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors">
@@ -31,19 +34,28 @@ const LoginPage = () => {
         </button>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 pb-6">
           <div className="flex-1 h-px bg-gray-300"></div>
           <span className="text-gray-500 text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
         {/* Email & Password Form */}
-        <form className="space-y-4">
+        <form className="flex flex-col gap-y-3">
+          <input
+            type="text"
+            placeholder="Enter your name"
+            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+          />
           <input
             type="email"
             placeholder="Enter email address"
             className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
           />
+
+          <div className="py-3">
+            <hr className="text-gray-300"/>
+          </div>
 
           <input
             type="password"
@@ -51,30 +63,38 @@ const LoginPage = () => {
             className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
           />
 
-          <button
-            type="submit"
-            className="w-full h-12 rounded-lg bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
-          >
-            Log in
-          </button>
+          <input
+            type="password"
+            placeholder="Confirm password"
+            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+          />
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="w-full h-12 rounded-lg bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
+            >
+              Log in
+            </button>
+          </div>
         </form>
 
         {/* Footer Text */}
-        <p className="text-xs text-gray-600 text-center mt-6">
+        <p className="text-xs text-gray-600 text-center pt-6">
           By continuing, you agree to Routana's{" "}
-          <a href="#" className="text-gray-900 hover:text-purple-600 underline">
+          <a href="#" className="text-gray-900 hover:text-purple-600 underline lg:no-underline">
             Terms of Service
           </a>{" "}
           and{" "}
-          <a href="#" className="text-gray-900 hover:text-purple-600 underline">
+          <a href="#" className="text-gray-900 hover:text-purple-600 underline lg:no-underline">
             Privacy Policy
           </a>
         </p>
 
         <p className="text-sm text-gray-600 text-center pt-6">
-          Don&apos;t have an account?{" "}
-          <Link to={"/signup"} className=" text-gray-900 hover:text-purple-600 underline lg:no-underline">
-            Sign up
+          Already have an account?{" "}
+          <Link to={"/login"} className=" text-gray-900 hover:text-purple-600 underline lg:no-underline">
+            Log in
           </Link>
         </p>
       </div>
@@ -82,4 +102,4 @@ const LoginPage = () => {
   );
 }
 
-export default LoginPage;
+export default SignupPage;
