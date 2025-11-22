@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   return (
-    <div className="min-h-screen bg-linear-to-br  from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <section className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
         <div className="flex justify-center pb-8">
           <svg
@@ -21,12 +21,14 @@ const LoginPage = () => {
           </svg>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-8">Welcome back</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-6">Welcome back</h1>
 
-        <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors">
-          <Chrome size={18} />
-          <span>Continue with Google</span>
-        </button>
+        <div className="pb-6">
+          <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors">
+            <Chrome size={18} />
+            <span>Continue with Google</span>
+          </button>
+        </div>
 
         <div className="flex items-center gap-4 pb-6">
           <div className="flex-1 h-px bg-gray-300"></div>
@@ -73,7 +75,7 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
-    </div>
+    </section>
   );
 }
 

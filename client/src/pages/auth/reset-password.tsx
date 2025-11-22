@@ -1,6 +1,6 @@
 const ResetPasswordPage = () => {
   return (
-    <div className="min-h-screen bg-linear-to-br  from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <section className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
         <div className="flex justify-center pb-8">
           <svg
@@ -41,7 +41,7 @@ const ResetPasswordPage = () => {
           </button>
         </form>
       </div>
-    </div>
+    </section>
   );
 }
 

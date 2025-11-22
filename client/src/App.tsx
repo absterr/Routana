@@ -8,7 +8,7 @@ import SignupPage from "./pages/auth/signup";
 
 export default function App() {
   return (
-    <>
+    <div className="bg-linear-to-br from-gray-50 to-gray-100">
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/new" element={<NewGoal />} />
@@ -17,6 +17,6 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
-    </>
+    </div>
   );
 };
