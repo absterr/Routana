@@ -1,7 +1,4 @@
-import { Chrome } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const LoginPage = () => {
+const ResetPasswordPage = () => {
   return (
     <div className="min-h-screen bg-linear-to-br  from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
@@ -21,29 +18,18 @@ const LoginPage = () => {
           </svg>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-8">Welcome back</h1>
-
-        <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors">
-          <Chrome size={18} />
-          <span>Continue with Google</span>
-        </button>
-
-        <div className="flex items-center gap-4 pb-6">
-          <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="text-gray-500 text-sm">or</span>
-          <div className="flex-1 h-px bg-gray-300"></div>
-        </div>
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-8">Reset password</h1>
 
         <form className="flex flex-col gap-y-4">
           <input
-            type="email"
-            placeholder="Enter email address"
+            type="password"
+            placeholder="Enter new password"
             className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
           />
 
           <input
             type="password"
-            placeholder="Enter password"
+            placeholder="Confirm new password"
             className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
           />
 
@@ -51,30 +37,12 @@ const LoginPage = () => {
             type="submit"
             className="w-full h-12 rounded-lg bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
           >
-            Log in
+            Reset password
           </button>
         </form>
-
-        <p className="text-xs text-gray-600 text-center pt-6">
-          By continuing, you agree to Routana's{" "}
-          <a href="#" className="text-gray-900 hover:text-purple-600 underline">
-            Terms of Service
-          </a>{" "}
-          and{" "}
-          <a href="#" className="text-gray-900 hover:text-purple-600 underline">
-            Privacy Policy
-          </a>
-        </p>
-
-        <p className="text-sm text-gray-600 text-center pt-6">
-          Don&apos;t have an account?{" "}
-          <Link to={"/signup"} className=" text-gray-900 hover:text-purple-600 underline lg:no-underline">
-            Sign up
-          </Link>
-        </p>
       </div>
     </div>
   );
 }
 
-export default LoginPage;
+export default ResetPasswordPage;
