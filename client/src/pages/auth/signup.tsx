@@ -2,7 +2,7 @@ import { signUp } from "@/lib/auth/auth-client";
 import { signupSchema } from "@/lib/auth/auth-schema";
 import { type ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome } from "lucide-react";
+import { Chrome, CircleAlert } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -105,25 +105,41 @@ const SignupPage = () => {
 
         <form className="flex flex-col gap-y-3" onSubmit={form.handleSubmit(onSubmit)}>
           {(["name", "email"] as const).map(
-            (field) => <input
-              type={field === "email" ? "email" : "text"}
-              placeholder={field === "email" ? "Enter your email address" : "Enter your name"}
-              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-              {...form.register(field)}
-            />
+            (field) => <div>
+              <input
+                type={field === "email" ? "email" : "text"}
+                placeholder={field === "email" ? "Enter your email address" : "Enter your name"}
+                className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+                {...form.register(field)}
+              />
+              {form.formState.errors[field] && (
+                <p className="text-sm text-red-500 pt-1">
+                  <CircleAlert size={12} className="inline pr-1" />
+                  {form.formState.errors[field].message}
+                </p>
+              )}
+            </div>
           )}
 
           <div className="py-3">
-            <hr className="text-gray-300"/>
+            <hr className="text-gray-300" />
           </div>
 
           {(["password", "confirmPassword"] as const).map(
-            (field) => <input
-              type="password"
-              placeholder={field === "password" ? "Enter your password" : "Confirm password"}
-              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-              {...form.register(field)}
-            />
+            (field) => <div>
+              <input
+                type="password"
+                placeholder={field === "password" ? "Enter your password" : "Confirm password"}
+                className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+                {...form.register(field)}
+              />
+              {form.formState.errors[field] && (
+                <p className="text-sm text-red-500 pt-1">
+                  <CircleAlert size={12} className="inline pr-1" />
+                  {form.formState.errors[field].message}
+                </p>
+              )}
+            </div>
           )}
 
           <div className="pt-2">
