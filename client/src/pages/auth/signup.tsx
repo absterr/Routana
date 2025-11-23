@@ -1,7 +1,69 @@
+import { signUp } from "@/lib/auth/auth-client";
+import { signupSchema } from "@/lib/auth/auth-schema";
+import { type ErrorContext } from "@better-fetch/fetch";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome } from "lucide-react";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import type z from "zod";
+import LoadingSpinner from "./LoadingSpinner";
 
 const SignupPage = () => {
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    }
+  });
+
+  const onSubmit = (formValues: z.infer<typeof signupSchema>) => {
+    startTransition(async () => {
+      await signUp.email(
+        {
+          name: formValues.name,
+          email: formValues.email,
+          password: formValues.password,
+        },
+        {
+          onSuccess: () => {
+            form.reset();
+            toast.success("Verification email sent", {
+              description:
+                "A verification email has been sent. Please check your email",
+            });
+          },
+          onError: (ctx: ErrorContext) => {
+            switch (ctx.error.status) {
+              case 422:
+                form.reset();
+                toast.error("Email already exists", {
+                  description:
+                    "Email already exists. Please try again with a different email or log in.",
+                });
+                break;
+              case 400:
+                form.reset();
+                toast.error("Invalid credentials. Please try again");
+                break;
+              case 429:
+                toast.error("Too many requests. Please try again later.");
+                break;
+              default:
+                console.log("Error: ", ctx.error.message);
+                toast.error("Could not sign up. Please try again");
+            }
+          },
+        }
+      );
+    });
+  }
+
   return (
     <section className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
@@ -21,65 +83,60 @@ const SignupPage = () => {
             <path d="M20 15L25 23H15L20 15Z" fill="neutral-950" />
           </svg>
         </div>
-        {/* Heading */}
+
         <header className="text-center pb-6">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-2">Create your account</h1>
           <p className="text-gray-500 text-sm">Get personalized roadmaps, progress tracking, and curated resources.</p>
         </header>
 
-        {/* Google Button */}
-        <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors">
+        <button
+          disabled={isPending}
+          className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors"
+        >
           <Chrome size={18} />
           <span>Continue with Google</span>
         </button>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 pb-6">
           <div className="flex-1 h-px bg-gray-300"></div>
           <span className="text-gray-500 text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        {/* Email & Password Form */}
-        <form className="flex flex-col gap-y-3">
-          <input
-            type="text"
-            placeholder="Enter your name"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
-          <input
-            type="email"
-            placeholder="Enter email address"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
+        <form className="flex flex-col gap-y-3" onSubmit={form.handleSubmit(onSubmit)}>
+          {(["name", "email"] as const).map(
+            (field) => <input
+              type={field === "email" ? "email" : "text"}
+              placeholder={field === "email" ? "Enter your email address" : "Enter your name"}
+              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+              {...form.register(field)}
+            />
+          )}
 
           <div className="py-3">
             <hr className="text-gray-300"/>
           </div>
 
-          <input
-            type="password"
-            placeholder="Enter password"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
-
-          <input
-            type="password"
-            placeholder="Confirm password"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
+          {(["password", "confirmPassword"] as const).map(
+            (field) => <input
+              type="password"
+              placeholder={field === "password" ? "Enter your password" : "Confirm password"}
+              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+              {...form.register(field)}
+            />
+          )}
 
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full h-12 rounded-lg bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
+              disabled={isPending}
+              className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
             >
-              Log in
+              {isPending ? <LoadingSpinner /> : "Create account"}
             </button>
           </div>
         </form>
 
-        {/* Footer Text */}
         <p className="text-xs text-gray-600 text-center pt-6">
           By continuing, you agree to Routana's{" "}
           <a href="#" className="text-gray-900 hover:text-purple-600 underline lg:no-underline">

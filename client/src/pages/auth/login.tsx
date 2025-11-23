@@ -1,13 +1,14 @@
+import { signIn } from "@/lib/auth/auth-client";
 import { loginSchema } from "@/lib/auth/auth-schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { type ErrorContext } from "@better-fetch/fetch";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Chrome, CircleAlert } from "lucide-react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import type z from "zod";
-import { signIn } from "@/lib/auth/auth-client";
-import { useTransition } from "react";
 import { toast } from "sonner";
+import type z from "zod";
+import LoadingSpinner from "./LoadingSpinner";
 
 const LoginPage = () => {
   const [isPending, startTransition] = useTransition();
@@ -87,17 +88,15 @@ const LoginPage = () => {
 
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-6">Welcome back</h1>
 
-        <div className="pb-6">
-          <button
-            className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors"
-            disabled={isPending}
-          >
-            <Chrome size={18} />
-            <span>Continue with Google</span>
-          </button>
-        </div>
+        <button
+          className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors"
+          disabled={isPending}
+        >
+          <Chrome size={18} />
+          <span>Continue with Google</span>
+        </button>
 
-        <div className="flex items-center gap-4 pb-6">
+        <div className="flex items-center gap-4 py-5">
           <div className="flex-1 h-px bg-gray-300"></div>
           <span className="text-gray-500 text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300"></div>
@@ -132,7 +131,7 @@ const LoginPage = () => {
             className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
             disabled={isPending}
           >
-            Log in
+            {isPending ? <LoadingSpinner /> : "Log in"}
           </button>
         </form>
 
