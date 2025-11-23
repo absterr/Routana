@@ -6,19 +6,33 @@ import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
 import RoadmapSVG from "./pages/roadmap";
+import { Toaster } from "sonner";
 
 export default function App() {
   return (
-    <div className="bg-linear-to-br from-gray-50 to-gray-100">
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/new" element={<NewGoal />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/roadmap" element={<RoadmapSVG />} />
-      </Routes>
-    </div>
+    <>
+      <div className="bg-linear-to-br from-gray-50 to-gray-100">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/new" element={<NewGoal />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/roadmap" element={<RoadmapSVG />} />
+        </Routes>
+      </div>
+      <Toaster
+        richColors
+        position="bottom-right"
+        toastOptions={{
+          classNames: {
+            toast: "rounded-xl shadow-md border text-sm",
+            success: "bg-green-100 border-green-500 text-green-900",
+            error: "bg-red-100 border-red-500 text-red-900",
+          },
+        }}
+      />
+    </>
   );
 };

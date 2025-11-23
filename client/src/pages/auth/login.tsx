@@ -1,7 +1,71 @@
-import { Chrome } from "lucide-react";
-import { Link } from "react-router-dom";
+import { loginSchema } from "@/lib/auth/auth-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { type ErrorContext } from "@better-fetch/fetch";
+import { Chrome, CircleAlert } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import type z from "zod";
+import { signIn } from "@/lib/auth/auth-client";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 const LoginPage = () => {
+  const [isPending, startTransition] = useTransition();
+  const navigate = useNavigate();
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
+  const onSubmit = (formValues: z.infer<typeof loginSchema>) => {
+    startTransition(async () => {
+      await signIn.email(
+        {
+          email: formValues.email,
+          password: formValues.password,
+        },
+        {
+          onSuccess: () => navigate("/", { replace: true }),
+          onError: (ctx: ErrorContext) => {
+            switch (ctx.error.status) {
+              case 400:
+                form.reset();
+                toast.error("Invalid credentials, please try again.");
+                break;
+              case 401:
+                toast.error("Incorrect credentials", {
+                  description: "Email or password is incorrect",
+                });
+                break;
+              case 403:
+                form.reset();
+                toast.error("Email address is unverified", {
+                  description: "Please verify your email address.",
+                });
+                break;
+              case 404:
+                form.reset();
+                toast.error("User not found", {
+                  description:
+                    "A user with this email does not exist. Please sign up.",
+                });
+                break;
+              case 429:
+                toast.error("Too many requests. Please try again later.");
+                break;
+              default:
+                console.log("Error: ", ctx.error.message);
+                toast.error("Something went wrong. Please try again.");
+            }
+          },
+        }
+      );
+    });
+  }
+
   return (
     <section className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
@@ -24,7 +88,10 @@ const LoginPage = () => {
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-6">Welcome back</h1>
 
         <div className="pb-6">
-          <button className="w-full h-12 rounded-lg border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors">
+          <button
+            className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors"
+            disabled={isPending}
+          >
             <Chrome size={18} />
             <span>Continue with Google</span>
           </button>
@@ -36,22 +103,34 @@ const LoginPage = () => {
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        <form className="flex flex-col gap-y-4">
-          <input
-            type="email"
-            placeholder="Enter email address"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
-
-          <input
-            type="password"
-            placeholder="Enter password"
-            className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
-          />
+        <form className="flex flex-col gap-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            {(["email", "password"] as const).map((field) =>
+              <div>
+                {field === "password" && <div className="pb-1 pr-1 flex justify-end">
+                  <Link
+                    to={"/forgot-password"}
+                    className="text-gray-700 hover:text-purple-600 underline lg:no-underline lg:hover:underline text-sm"
+                  >Forgot password?</Link>
+                </div>}
+                <input
+                  type={field}
+                  placeholder={ field === "email" ? "Enter email address" : "Enter password" }
+                  className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 font-medium transition-colors"
+                  {...form.register(field)}
+                />
+                {form.formState.errors[field] && (
+                  <p className="text-sm text-red-500 pt-1">
+                    <CircleAlert size={12} className="inline pr-1"/>
+                    {form.formState.errors[field].message}
+                  </p>
+                )}
+              </div>
+            )}
 
           <button
             type="submit"
-            className="w-full h-12 rounded-lg bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
+            className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
+            disabled={isPending}
           >
             Log in
           </button>
@@ -70,7 +149,7 @@ const LoginPage = () => {
 
         <p className="text-sm text-gray-600 text-center pt-6">
           Don&apos;t have an account?{" "}
-          <Link to={"/signup"} className=" text-gray-900 hover:text-purple-600 underline lg:no-underline">
+          <Link to={"/signup"} className=" text-gray-900 hover:text-purple-600 underline lg:no-underline lg:hover:underline">
             Sign up
           </Link>
         </p>
