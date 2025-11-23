@@ -21,7 +21,7 @@ const optionSchema = z.object({
     status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A brief explanation of what the sub-topic covers."),
     resources: z.array(resourceSchema).describe("A list of links or materials for this sub-topic."),
-    // Note: options array is intentionally omitted here to prevent infinite recursion
+    // NOTE: options array is intentionally omitted here to prevent infinite recursion
 });
 
 const topicSchema = z.object({
@@ -63,8 +63,6 @@ const relatedFieldSchema = z.object({
 });
 
 
-
-// Combines all schemas into the single final structure for the roadmap JSON.
 export const roadmapSchema = z.object({
     meta: z.object({
         title: z.string().describe("The title of the generated roadmap (e.g., 'Frontend Developer Roadmap')."),
