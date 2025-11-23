@@ -14,3 +14,13 @@ export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) 
 
   return res.json();
 }
+
+export const getRoadmapGraph = async () => {
+  const res = await fetch("/api/roadmap", {
+    method: "GET"
+  });
+
+  if (!res.ok) throw new Error("Failed to get roadmap graph");
+
+  return res.json();
+}

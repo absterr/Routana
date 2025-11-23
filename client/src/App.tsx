@@ -5,6 +5,7 @@ import ForgotPasswordPage from "./pages/auth/forgot-password";
 import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
+import RoadmapSVG from "./pages/roadmap";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/roadmap" element={<RoadmapSVG />} />
       </Routes>
     </div>
   );
