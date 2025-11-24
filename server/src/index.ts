@@ -1,6 +1,6 @@
 import express from "express";
 import http from "http";
-import goalRoutes from "./goals/goal.controller.js";
+import goalRoutes from "./goals/goal.controllers.js";
 import env from "./lib/env.js";
 import { auth } from "./lib/auth.js";
 import { toNodeHandler } from "better-auth/node";
