@@ -7,4 +7,5 @@ export const {
   requestPasswordReset,
   resetPassword,
   useSession,
+  getSession
 } = createAuthClient();

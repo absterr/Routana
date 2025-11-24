@@ -1,6 +1,6 @@
+import useCachedSession from "@/lib/auth/useCachedSession";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSession } from "../../lib/auth/auth-client";
 import LoadingSpinner from "./LoadingSpinner";
 
 const authRoutes = new Set([
@@ -13,16 +13,21 @@ const authRoutes = new Set([
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { data, isPending } = useSession();
+  const { data, isPending } = useCachedSession();
+
+  const session = data?.data?.session;
   const isAuthRoute = authRoutes.has(pathname);
-  const isAuthenticated = !!(data && data.session);
+  const isAuthenticated = !!(session);
 
   useEffect(() => {
     if (isPending) return;
     if (!isAuthRoute && !isAuthenticated) {
       navigate("/login", { replace: true });
-    } else if (isAuthRoute && isAuthenticated) {
+      return;
+    }
+    if (isAuthRoute && isAuthenticated) {
       navigate("/", { replace: true });
+      return;
     }
   }, [isAuthenticated, isPending, isAuthRoute, navigate]);
 
