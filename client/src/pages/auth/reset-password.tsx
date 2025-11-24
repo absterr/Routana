@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
+import LoadingSpinner from "./LoadingSpinner";
 
 const ResetPasswordPage = () => {
   const [isPending, startTransition] = useTransition();
@@ -55,8 +56,6 @@ const ResetPasswordPage = () => {
     });
   };
 
-
-
   return (
     <section className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md px-6 py-12">
@@ -89,7 +88,7 @@ const ResetPasswordPage = () => {
               />
               {form.formState.errors[field] && (
                 <p className="text-sm text-red-500 pt-1">
-                  <CircleAlert size={12} className="inline pr-1" />
+                  <CircleAlert size={14} className="inline pr-1" />
                   {form.formState.errors[field].message}
                 </p>
               )}
@@ -100,7 +99,7 @@ const ResetPasswordPage = () => {
             disabled={isPending}
             className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
           >
-            Reset password
+            {isPending ? <LoadingSpinner /> : "Reset password"}
           </button>
         </form>
       </div>

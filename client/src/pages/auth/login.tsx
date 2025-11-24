@@ -119,7 +119,7 @@ const LoginPage = () => {
                 />
                 {form.formState.errors[field] && (
                   <p className="text-sm text-red-500 pt-1">
-                    <CircleAlert size={12} className="inline pr-1"/>
+                    <CircleAlert size={14} className="inline pr-1"/>
                     {form.formState.errors[field].message}
                   </p>
                 )}

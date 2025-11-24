@@ -6,7 +6,7 @@ const getEmailSchema = () =>
 const getNameSchema = () =>
   string({ error: "Name is required" })
     .min(1, "Name is required")
-    .max(20, "Name must be less than 20 characters");
+    .max(24, "Name must be less than 25 characters");
 
 const getPasswordSchema = () =>
   string({ error: "Password is required " })
