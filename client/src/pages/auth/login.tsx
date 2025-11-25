@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { signIn } from "@/lib/auth/auth-client";
 import { loginSchema } from "@/lib/auth/auth-schema";
 import { type ErrorContext } from "@better-fetch/fetch";
@@ -8,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
-import LoadingSpinner from "./LoadingSpinner";
 
 const LoginPage = () => {
   const [isPending, startTransition] = useTransition();

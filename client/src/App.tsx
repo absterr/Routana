@@ -1,25 +1,27 @@
-import Dashboard from "@/pages/dashboard";
-import NewGoal from "@/pages/new-goal";
+import DashboardPage from "@/pages/main/dashboard";
+import NewGoalPage from "@/pages/main/new-goal";
+import RoadmapSVG from "@/pages/main/roadmap";
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import ForgotPasswordPage from "./pages/auth/forgot-password";
 import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
-import RoadmapSVG from "./pages/roadmap";
+import GoalsPage from "./pages/main/goals";
 
 export default function App() {
   return (
     <>
       <div className="bg-linear-to-br from-gray-50 to-gray-100">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/new-goal" element={<NewGoal />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/new-goal" element={<NewGoalPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/roadmap" element={<RoadmapSVG />} />
+          <Route path="/goals" element={<GoalsPage />} />
         </Routes>
       </div>
       <Toaster

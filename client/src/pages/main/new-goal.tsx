@@ -30,7 +30,7 @@ const fields: Field[] = [
   },
 ]
 
-const NewGoalForm = () => {
+const NewGoalPage = () => {
   const form = useForm<z.infer<typeof newGoalSchema>>({
     resolver: zodResolver(newGoalSchema),
     defaultValues: {
@@ -144,4 +144,4 @@ const NewGoalForm = () => {
   )
 }
 
-export default NewGoalForm
+export default NewGoalPage

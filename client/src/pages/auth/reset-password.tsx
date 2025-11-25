@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { resetPassword } from "@/lib/auth/auth-client";
 import { resetPasswordSchema } from "@/lib/auth/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
-import LoadingSpinner from "./LoadingSpinner";
 
 const ResetPasswordPage = () => {
   const [isPending, startTransition] = useTransition();

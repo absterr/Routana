@@ -1,14 +1,14 @@
+import LoadingSpinner from "@/components/LoadingSpinner";
 import useCachedSession from "@/lib/auth/useCachedSession";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import LoadingSpinner from "./LoadingSpinner";
 
-const authRoutes = new Set([
+const authRoutes = [
   "/login",
   "/signup",
   "/forgot-password",
   "/reset-password",
-]);
+]
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { data, isPending } = useCachedSession();
 
   const session = data?.data?.session;
-  const isAuthRoute = authRoutes.has(pathname);
+  const isAuthRoute = authRoutes.includes(pathname);
   const isAuthenticated = !!(session);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   if (isPending) {
     return <div className="min-h-screen flex items-center justify-center">
       <LoadingSpinner />
-      </div>
+    </div>
   }
 
   return <div className="bg-linear-to-br from-gray-50 to-gray-100">
