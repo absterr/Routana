@@ -2,6 +2,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import useCachedSession from "@/lib/auth/useCachedSession";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 const authRoutes = [
   "/login",
@@ -37,9 +38,14 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     </div>
   }
 
-  return <div className="bg-linear-to-br from-gray-50 to-gray-100">
-    {children}
-  </div>
+  return (
+    <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
+      {!isAuthRoute && <Navbar />}
+      <div className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
+        {children}
+      </div>
+    </div>
+  );
 }
 
 export default AuthWrapper;

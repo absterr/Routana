@@ -12,18 +12,18 @@ import GoalsPage from "./pages/main/goals";
 export default function App() {
   return (
     <>
-      <div className="bg-linear-to-br from-gray-50 to-gray-100">
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/new-goal" element={<NewGoalPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/roadmap" element={<RoadmapSVG />} />
-          <Route path="/goals" element={<GoalsPage />} />
-        </Routes>
-      </div>
+        <div className="bg-linear-to-br from-gray-50 to-gray-100">
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/new-goal" element={<NewGoalPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/roadmap" element={<RoadmapSVG />} />
+            <Route path="/goals" element={<GoalsPage />} />
+          </Routes>
+        </div>
       <Toaster
         richColors
         position="bottom-right"
