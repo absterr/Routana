@@ -1,6 +1,6 @@
 import { ElkEdge, ElkNode } from "elkjs";
 import { z } from "zod";
-import { roadmapSchema } from "../goals/goal.schema.js";
+import { roadmapSchema } from "../goal.schema.js";
 
 const NODE_SIZES = {
   phase: { width: 360, height: 70 },

@@ -1,7 +1,7 @@
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { user } from "../models/auth.models.js";
-import { roadmapSchema } from "../../goals/goal.schema.js";
 import z from "zod";
+import { roadmapSchema } from "../../goals/goal.schema.js";
+import { user } from "./auth.models.js";
 
 const statusEnum = pgEnum("status", ["Active", "Pending", "Completed"]);
 

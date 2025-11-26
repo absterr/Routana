@@ -1,4 +1,4 @@
-const roadmap = {
+const mockRoadmap = {
   "meta": {
     "title": "DevOps Learning Roadmap",
     "userContext": {
@@ -458,4 +458,4 @@ const roadmap = {
   ]
 };
 
-export default roadmap;
+export default mockRoadmap;
