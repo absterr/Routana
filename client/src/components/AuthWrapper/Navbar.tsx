@@ -8,7 +8,7 @@ const Navbar = () => {
         <div className="max-w-5xl w-full px-6">
           <div className="flex items-center justify-between w-full py-6">
             <Link to={"/"}>
-              <h1 className="font-semibold text-3xl text-purple-600">Routana</h1>
+              <p className="font-semibold text-3xl text-purple-600">Routana</p>
             </Link>
             <UserNav />
           </div>

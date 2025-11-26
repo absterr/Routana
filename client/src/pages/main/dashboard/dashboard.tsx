@@ -1,16 +1,10 @@
-import { Plus } from "lucide-react"
-import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { Plus, Rocket } from "lucide-react"
+import { Link } from "react-router-dom"
 import GoalPreview from "./GoalPreview"
 
-interface Goal {
-  id: number
-  title: string
-  description?: string
-  progress: number
-  timeframe: string
-}
-
-const mockGoals: Goal[] = [
+const mockGoals = [
   {
     id: 1,
     title: "Become a full-stack developer",
@@ -32,50 +26,83 @@ const mockGoals: Goal[] = [
     progress: 20,
     timeframe: "4 months",
   },
-]
+];
 
 const quickStats = [
-  { label: "Active Goals", value: "3", color: "from-purple-600 to-purple-500" },
-  { label: "Total Progress", value: "42%", color: "from-purple-500 to-purple-400" },
-  { label: "Completed", value: "12", color: "from-purple-600 to-indigo-600" },
+  { label: "Active Goals", value: "3" },
+  { label: "Total Progress", value: "42%" },
+  { label: "Completed", value: "12" },
 ]
 
 const DashboardPage = () => {
-  const [expandedGoal, setExpandedGoal] = useState<number | null>(null);
-
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6">Dashboard</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-        {quickStats.map((stat, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-6 border border-gray-200 shadow-xs">
-            <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
-            <div className={`h-1 w-12 rounded-full bg-linear-to-r ${stat.color} mt-4`}></div>
+
+      <div className="pb-12">
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4">
+            {quickStats.map((stat, i) => (
+              <div key={i} className="px-6 sm:p-6">
+                <div className={cn("py-6 sm:py-2 border-gray-200", {
+                  "border-b sm:border-r sm:border-b-0": i !== quickStats.length - 1
+                })}>
+                  <p className="text-sm text-gray-600 font-semibold">{stat.label}</p>
+                  <p className="text-3xl font-bold text-gray-900 pt-2">{stat.value}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 pb-6">Active Goals</h2>
-        <div className="flex flex-col gap-4">
-          {mockGoals.map((goal) => (
-            <GoalPreview key={goal.id} goal={goal} expandedGoal={expandedGoal} setExpandedGoal={setExpandedGoal} />
-          ))}
-        </div>
-      </div>
-
-      <div className="pt-12">
-        <div className="bg-linear-to-r from-purple-50 to-purple-100 rounded-xl p-8 text-center border border-purple-200">
-          <h3 className="text-xl font-bold text-gray-900">Ready to start a new learning journey?</h3>
-          <p className="text-gray-600 pt-2">Create your first goal and begin tracking your progress today.</p>
-          <div className="pt-4">
-            <button className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2">
-              <Plus className="w-5 h-5" />
-              Create a Goal
-            </button>
+        <div className="w-full flex justify-between items-center pb-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Goals</h2>
           </div>
+          {mockGoals.length !== 0 &&
+            <Link to={"/new-goal"}>
+              <Button className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                New Goal
+              </Button>
+            </Link>
+          }
         </div>
+        {mockGoals.length === 0 ? (
+          <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
+            <Rocket className="w-9 h-9" />
+            <div className="text-center pb-2">
+              <h3 className="text-xl sm:text-2xl font-bold text-balance">No goals yet</h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto pt-2">
+                Create your first learning goal to get started on your growth journey
+              </p>
+            </div>
+            <Link to={"/new-goal"}>
+              <Button
+                className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Create Your First Goal
+              </Button>
+            </Link>
+          </div>
+        ) :
+          <div className="bg-white rounded-xl border border-gray-200 transition-all duration-150">
+            <div className="flex flex-col gap-4">
+              {mockGoals.map((goal, i) => (
+                <div key={goal.id} className="px-6">
+                  <div className={cn("py-4 border-gray-200",
+                    { "border-b": i !== mockGoals.length - 1 }
+                  )}>
+                    <GoalPreview goal={goal} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        }
       </div>
     </section>
   );

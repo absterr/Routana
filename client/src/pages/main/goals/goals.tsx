@@ -9,9 +9,9 @@ const GoalsPage = () => {
         <div className="flex flex-1 flex-col gap-8 p-8">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-1">
-              <h2 className="text-3xl font-semibold tracking-tight">
+              <h1 className="text-3xl font-semibold tracking-tight">
                 Goals
-              </h2>
+              </h1>
               <p className="text-muted-foreground">
                 Here&apos;s a list of your goals.
               </p>
