@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import UserNav from "./UserNav";
 
-const Navbar = () => {
+const Navbar = ({ hasSession }: { hasSession: boolean }) => {
   return (
     <nav className="border-b border-gray-200">
       <div className="flex justify-center">
@@ -10,7 +10,7 @@ const Navbar = () => {
             <Link to={"/"}>
               <p className="font-semibold text-3xl text-purple-600">Routana</p>
             </Link>
-            <UserNav />
+            {hasSession ? <UserNav /> : <div></div>}
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
-import useCachedSession from "@/lib/auth/useCachedSession";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import { useSession } from "@/lib/auth/auth-client";
 
 const authRoutes = [
   "/login",
@@ -14,25 +14,25 @@ const authRoutes = [
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { data, isPending } = useCachedSession();
+  const { data, isPending, isRefetching } = useSession();
 
-  const session = data?.data?.session;
-  const isAuthRoute = authRoutes.includes(pathname);
-  const isAuthenticated = !!(session);
+  const session = data?.session
+  const isAuthRoute = authRoutes.includes(pathname.replace(/\/$/, ""));
+  const hasSession = !!(session);
 
   useEffect(() => {
-    if (isPending) return;
-    if (!isAuthRoute && !isAuthenticated) {
-      navigate("/login", { replace: true });
-      return;
-    }
-    if (isAuthRoute && isAuthenticated) {
+    if (isPending || isRefetching) return;
+    if (!isAuthRoute && !hasSession) {
+        navigate("/login", { replace: true });
+        return;
+      }
+    if (isAuthRoute && hasSession) {
       navigate("/", { replace: true });
       return;
     }
-  }, [isAuthenticated, isPending, isAuthRoute, navigate]);
+  }, [isAuthRoute, hasSession, isPending, isRefetching, navigate]);
 
-  if (isPending) {
+  if (isPending || isRefetching) {
     return <div className="min-h-screen flex items-center justify-center">
       <LoadingSpinner />
     </div>
@@ -40,7 +40,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
-      {!isAuthRoute && <Navbar />}
+      {!isAuthRoute && <Navbar hasSession={hasSession} />}
       <div className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
         {children}
       </div>

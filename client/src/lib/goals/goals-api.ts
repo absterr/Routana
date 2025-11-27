@@ -7,8 +7,15 @@ export const getDashboardGoals = async () => {
     credentials: "include"
   });
 
-  if (!res.ok) throw new Error("Failed to get goals");
-  return res.json();
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to load dashboard");
+  }
+  return {
+    status: res.status,
+    goals: data.goals ?? [],
+  }
 }
 
 export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
@@ -21,9 +28,13 @@ export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) 
     body: JSON.stringify(goalDetails)
   });
 
-  if (!res.ok) throw new Error("Failed to generate roadmap");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to generate roadmap");
 
-  return res.json();
+  return {
+    status: res.status,
+    goalId: data.goalId ?? ""
+  }
 }
 
 export const getRoadmapGraph = async () => {

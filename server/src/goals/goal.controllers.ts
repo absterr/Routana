@@ -77,7 +77,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
 
     return res.status(200).json({ goals: result });
   } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -105,7 +105,7 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
 
     if (!response.text || response.text.trim().length === 0) {
       console.error("Gemini model returned empty response text.");
-      return res.status(500).json({ message: "Failed to generate roadmap content." });
+      return res.status(500).json({ error: "Failed to generate roadmap content." });
     }
 
     const roadmapJson = JSON.parse(response.text);
@@ -123,9 +123,9 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
     return res.status(200).json({ goalId: newGoal.id });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ message: "Bad request" });
+      return res.status(400).json({ error: "Bad request" });
     }
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 

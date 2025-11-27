@@ -29,7 +29,9 @@ const LoginPage = () => {
           password: formValues.password,
         },
         {
-          onSuccess: () => navigate("/", { replace: true }),
+          onSuccess: async () => {
+            navigate("/", { replace: true });
+          },
           onError: (ctx: ErrorContext) => {
             switch (ctx.error.status) {
               case 400:

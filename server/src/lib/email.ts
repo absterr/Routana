@@ -1,8 +1,6 @@
-import { response } from "express";
 import { Resend } from "resend";
 import env from "./env.js";
 
-const INTERNAL_SERVER_ERROR = 500;
 const resend = new Resend(env.RESEND_API_KEY);
 
 interface Params {
@@ -20,16 +18,9 @@ export const sendAuthMail = async ({ to, subject, template, url }: Params) => {
       subject: subject.trim(),
       html: template.replace("{URL}", url),
     });
-    if (error) {
-      return response.status(INTERNAL_SERVER_ERROR).json({
-        message: `Failed to send email, ${error.message}`,
-      });
-    }
-
+    if (error) return error;
     return data;
   } catch (error) {
-    return response.status(INTERNAL_SERVER_ERROR).json({
-      message: `Error sending email: ${error}`,
-    });
+    return error;
   }
 };

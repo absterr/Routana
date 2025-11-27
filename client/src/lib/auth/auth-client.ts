@@ -6,5 +6,5 @@ export const {
   signOut,
   requestPasswordReset,
   resetPassword,
-  getSession
+  useSession
 } = createAuthClient();

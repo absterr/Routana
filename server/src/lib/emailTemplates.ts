@@ -67,7 +67,7 @@ export const EMAIL_VERIFICATION_TEMPLATE = `
         <p>This link will expire in 15 minutes for security reasons.</p>
         <p>
           Best regards,<br />
-          Auth Team
+          Routana Team
         </p>
       </div>
       <div
@@ -165,7 +165,7 @@ export const PASSWORD_RESET_TEMPLATE = `
         <p>This link will expire in 15 minutes for security reasons.</p>
         <p>
           Best regards,<br />
-          Auth Team
+          Routana Team
         </p>
       </div>
 

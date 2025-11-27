@@ -8,11 +8,12 @@ import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
 import GoalsPage from "./pages/main/goals";
+import AuthWrapper from "./components/AuthWrapper/AuthWrapper";
 
 export default function App() {
   return (
     <>
-        <div className="bg-linear-to-br from-gray-50 to-gray-100">
+        <AuthWrapper>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/new-goal" element={<NewGoalPage />} />
@@ -23,7 +24,7 @@ export default function App() {
             <Route path="/roadmap" element={<RoadmapSVG />} />
             <Route path="/goals" element={<GoalsPage />} />
           </Routes>
-        </div>
+        </AuthWrapper>
       <Toaster
         richColors
         position="bottom-right"
