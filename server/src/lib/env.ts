@@ -9,6 +9,8 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   RESEND_API_KEY: z.string(),
   EMAIL_FROM: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
   GEMINI_API_KEY: z.string(),
 });
 

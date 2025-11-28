@@ -54,6 +54,9 @@ const DashboardPage = () => {
             ))}
           </div>
         </div>
+        <div className="py-4 px-1">
+          <Link to={"/goals"} className="underline text-gray-600 hover:text-purple-600 transition-colors duration-100">View all goals</Link>
+        </div>
       </div>
 
       <div>

@@ -4,6 +4,7 @@ import { db } from "../db/drizzle.js";
 import { account, session, user, verification } from "../db/models/auth.models.js";
 import { sendAuthMail } from "./email.js";
 import { EMAIL_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE } from "./emailTemplates.js";
+import env from "./env.js";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -41,6 +42,13 @@ export const auth = betterAuth({
         template: EMAIL_VERIFICATION_TEMPLATE,
         url
       });
+    }
+  },
+  socialProviders: {
+    google: {
+      enabled: true,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET
     }
   }
 });

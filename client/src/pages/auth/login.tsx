@@ -1,9 +1,12 @@
+import GoogleIcon from "@/components/GoogleIcon";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth/auth-client";
 import { loginSchema } from "@/lib/auth/auth-schema";
+import type { Provider } from "@/lib/provider";
 import { type ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome, CircleAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,6 +23,27 @@ const LoginPage = () => {
       password: ""
     }
   });
+
+
+  const handleSocialSignIn = (provider: Provider) => () => {
+    startTransition(async () => {
+      await signIn.social(
+        {
+          provider: provider,
+        },
+        {
+          onSuccess: () => {
+            navigate("/", { replace: true  });
+          },
+          onError: () => {
+            toast.error("Couldn't sign in", {
+              description: `Could not sign in with ${provider}. Please try again`,
+            });
+          },
+        }
+      );
+    });
+  };
 
   const onSubmit = (formValues: z.infer<typeof loginSchema>) => {
     startTransition(async () => {
@@ -90,13 +114,14 @@ const LoginPage = () => {
 
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center pb-6">Welcome back</h1>
 
-        <button
+        <Button
           className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium flex items-center justify-center gap-3 transition-colors"
           disabled={isPending}
+          onClick={handleSocialSignIn("google")}
         >
-          <Chrome size={18} />
-          <span>Continue with Google</span>
-        </button>
+          <GoogleIcon />
+          <span className="text-base">Continue with Google</span>
+        </Button>
 
         <div className="flex items-center gap-4 py-5">
           <div className="flex-1 h-px bg-gray-300"></div>

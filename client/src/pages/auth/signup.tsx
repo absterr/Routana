@@ -1,17 +1,21 @@
+import GoogleIcon from "@/components/GoogleIcon";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { signUp } from "@/lib/auth/auth-client";
+import { Button } from "@/components/ui/button";
+import { signIn, signUp } from "@/lib/auth/auth-client";
 import { signupSchema } from "@/lib/auth/auth-schema";
+import type { Provider } from "@/lib/provider";
 import { type ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome, CircleAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
 
 const SignupPage = () => {
   const [isPending, startTransition] = useTransition();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -21,6 +25,26 @@ const SignupPage = () => {
       confirmPassword: ""
     }
   });
+
+  const handleSocialSignIn = (provider: Provider) => () => {
+    startTransition(async () => {
+      await signIn.social(
+        {
+          provider: provider,
+        },
+        {
+          onSuccess: () => {
+            navigate("/", { replace: true  });
+          },
+          onError: () => {
+            toast.error("Couldn't sign in", {
+              description: `Could not sign in with ${provider}. Please try again`,
+            });
+          },
+        }
+      );
+    });
+  };
 
   const onSubmit = (formValues: z.infer<typeof signupSchema>) => {
     startTransition(async () => {
@@ -89,13 +113,14 @@ const SignupPage = () => {
           <p className="text-gray-500 text-sm">Get personalized roadmaps, progress tracking, and curated resources.</p>
         </header>
 
-        <button
+        <Button
           disabled={isPending}
           className="w-full h-12 rounded-xl border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:cursor-pointer font-medium mb-4 flex items-center justify-center gap-3 transition-colors"
+          onClick={handleSocialSignIn("google")}
         >
-          <Chrome size={18} />
-          <span>Continue with Google</span>
-        </button>
+          <GoogleIcon />
+          <span className="text-base">Continue with Google</span>
+        </Button>
 
         <div className="flex items-center gap-4 pb-6">
           <div className="flex-1 h-px bg-gray-300"></div>

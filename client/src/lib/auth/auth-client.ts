@@ -7,4 +7,9 @@ export const {
   requestPasswordReset,
   resetPassword,
   useSession
-} = createAuthClient();
+} = createAuthClient({
+  sessionOptions: {
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000
+  }
+});

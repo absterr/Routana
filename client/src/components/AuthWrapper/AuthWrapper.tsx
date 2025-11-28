@@ -16,12 +16,14 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { pathname } = useLocation();
   const { data, isPending, isRefetching } = useSession();
 
-  const session = data?.session
+  const session = data?.session;
   const isAuthRoute = authRoutes.includes(pathname.replace(/\/$/, ""));
   const hasSession = !!(session);
 
+  const isLoading = isPending || (isRefetching && !data);
+
   useEffect(() => {
-    if (isPending || isRefetching) return;
+    if (isLoading) return;
     if (!isAuthRoute && !hasSession) {
         navigate("/login", { replace: true });
         return;
@@ -30,20 +32,20 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       navigate("/", { replace: true });
       return;
     }
-  }, [isAuthRoute, hasSession, isPending, isRefetching, navigate]);
+  }, [isLoading, isAuthRoute, hasSession, navigate]);
 
-  if (isPending || isRefetching) {
+  if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
-      <LoadingSpinner />
+      <LoadingSpinner size={8} />
     </div>
   }
 
   return (
     <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
       {!isAuthRoute && <Navbar hasSession={hasSession} />}
-      <div className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
+      <main className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

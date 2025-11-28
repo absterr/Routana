@@ -22,8 +22,8 @@ import { Skeleton } from "../ui/skeleton";
 
 const UserNav = () => {
   const [pending, startTransition] = useTransition();
-  const navigate = useNavigate();
   const { data, isPending } = useSession();
+  const navigate = useNavigate();
   const user = data?.user;
 
   const handleLogOut = () => {
