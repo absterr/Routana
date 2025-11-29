@@ -1,178 +1,123 @@
 import { ElkEdge, ElkNode } from "elkjs";
 import { z } from "zod";
-import { roadmapSchema } from "../goal.schema.js";
+import { roadmapSchema } from "../goal.schema.js"; // Adjust path as needed
 
 const NODE_SIZES = {
-  phase: { width: 360, height: 70 },
-  topic: { width: 220, height: 60 },
-  option: { width: 180, height: 56 },
-  checkpoint: { width: 280, height: 48 },
-  extra: { width: 220, height: 56 },
-  related: { width: 160, height: 44 },
+  phase: { width: 300, height: 60 },
+  topic: { width: 180, height: 50 },
+  option: { width: 150, height: 40 },
+  checkpoint: { width: 250, height: 40 },
+  extra: { width: 180, height: 50 },
+  related: { width: 160, height: 40 },
 };
 
 export const jsonToElk = (roadmapJson: z.infer<typeof roadmapSchema>): ElkNode => {
   let edgeCounter = 0;
-  const nextEdgeId = () => {
-    edgeCounter += 1;
-    return `e-${edgeCounter}`;
-  };
+  const nextEdgeId = () => `e-${edgeCounter++}`;
 
   const children: ElkNode[] = [];
   const edges: ElkEdge[] = [];
 
-  let previousPhaseId: string | null = null;
+  // This variable tracks the very bottom node of the "Main Spine"
+  // effectively daisy-chaining phases and core topics vertically.
+  let lastSpineNodeId: string | null = null;
 
-  roadmapJson.phases.forEach((phase) => {
-    const phaseNodeId = `phase__${phase.id}`;
-
+  // --- Helper to add nodes ---
+  const addNode = (id: string, type: string, label: string, sizes: { width: number, height: number }, status?: string) => {
     children.push({
-      id: phaseNodeId,
-      width: NODE_SIZES.phase.width,
-      height: NODE_SIZES.phase.height,
-      labels: [{ text: phase.title }],
-      layoutOptions: {
-        'nodeLabels.placement': '[H_CENTER, V_CENTER]',
-        'portConstraints': 'FIXED_SIDE'
-      },
-      properties: { type: 'phase' } as any
+      id,
+      width: sizes.width,
+      height: sizes.height,
+      labels: [{ text: label }],
+      properties: { type, status } as any
     });
+  };
 
-    if (previousPhaseId) {
-      edges.push({
-        id: nextEdgeId(),
-        sources: [previousPhaseId],
-        targets: [phaseNodeId]
-      });
+  // --- Helper to add edges ---
+  const addEdge = (source: string, target: string, type: 'main' | 'sub') => {
+    edges.push({
+      id: nextEdgeId(),
+      sources: [source],
+      targets: [target],
+      // We attach a property here so the frontend knows how to style it (solid vs dotted)
+      properties: { type } as any
+    });
+  };
+
+  // 1. ITERATE PHASES
+  roadmapJson.phases.forEach((phase) => {
+    const phaseId = `phase__${phase.id}`;
+
+    // Create Phase Node
+    addNode(phaseId, 'phase', phase.title, NODE_SIZES.phase);
+
+    // Link to previous spine node (if exists)
+    if (lastSpineNodeId) {
+      addEdge(lastSpineNodeId, phaseId, 'main');
     }
-    previousPhaseId = phaseNodeId;
+    // Update spine
+    lastSpineNodeId = phaseId;
 
+    // 2. ITERATE TOPICS (These continue the spine)
     phase.topics.forEach((topic) => {
-      const topicNodeId = `topic__${topic.id}`;
+      const topicId = `topic__${topic.id}`;
 
-      children.push({
-        id: topicNodeId,
-        width: NODE_SIZES.topic.width,
-        height: NODE_SIZES.topic.height,
-        labels: [{ text: topic.title }] as any,
-        layoutOptions: { 'nodeLabels.placement': '[H_CENTER, V_CENTER]' },
-        properties: { type: 'topic', status: topic.status } as any,
-      });
+      addNode(topicId, 'topic', topic.title, NODE_SIZES.topic, topic.status);
 
-      edges.push({
-        id: nextEdgeId(),
-        sources: [phaseNodeId],
-        targets: [topicNodeId]
-      });
+      // Connect Phase (or previous topic) -> This Topic
+      if (lastSpineNodeId) {
+        addEdge(lastSpineNodeId, topicId, 'main');
+      }
+      lastSpineNodeId = topicId;
 
-      if (topic.options && topic.options.length) {
+      // 3. ITERATE OPTIONS (These are branches, they do NOT update lastSpineNodeId)
+      if (topic.options && topic.options.length > 0) {
         topic.options.forEach((opt) => {
-          const optNodeId = `option__${opt.id}`;
+          const optId = `option__${opt.id}`;
+          addNode(optId, 'option', opt.title, NODE_SIZES.option, opt.status);
 
-          children.push({
-            id: optNodeId,
-            width: NODE_SIZES.option.width,
-            height: NODE_SIZES.option.height,
-            labels: [{ text: opt.title }] as any,
-            properties: { type: 'option', status: opt.status } as any,
-          });
-
-          edges.push({
-            id: nextEdgeId(),
-            sources: [topicNodeId],
-            targets: [optNodeId]
-          });
+          // Connect Topic -> Option (Sub Edge)
+          addEdge(topicId, optId, 'sub');
         });
       }
     });
-  });
 
-  (roadmapJson.checkpoints || []).forEach((cp) => {
-    const cpId = `checkpoint__${cp.id}`;
+    // 4. CHECKPOINTS (Inject into the spine after the phase's topics)
+    const phaseCheckpoints = roadmapJson.checkpoints.filter(cp => cp.phaseId === phase.id);
+    phaseCheckpoints.forEach(cp => {
+      const cpId = `checkpoint__${cp.id}`;
+      addNode(cpId, 'checkpoint', cp.description, NODE_SIZES.checkpoint);
 
-    children.push({
-        id: cpId,
-        width: NODE_SIZES.checkpoint.width,
-        height: NODE_SIZES.checkpoint.height,
-        labels: [{ text: cp.description }] as any,
-        properties: { type: 'checkpoint' } as any
-    });
-
-    const phaseNodeId = `phase__${cp.phaseId}`;
-
-    edges.push({
-        id: nextEdgeId(),
-        sources: [phaseNodeId],
-        targets: [cpId]
+      if (lastSpineNodeId) {
+        addEdge(lastSpineNodeId, cpId, 'main');
+      }
+      lastSpineNodeId = cpId;
     });
   });
 
-  let lastAnchorId: string | null = previousPhaseId;
+  // 5. EXTRAS & RELATED (Append to the very end of the spine)
+  if (roadmapJson.extras && roadmapJson.extras.length > 0) {
+     // Optional: Add a separator node or just continue
+     roadmapJson.extras.forEach(extra => {
+        const extraId = `extra__${extra.id}`;
+        addNode(extraId, 'extra', extra.title, NODE_SIZES.extra, extra.status);
 
-  (roadmapJson.extras || []).forEach((ex) => {
-    const exId = `extra__${ex.id}`;
+        if (lastSpineNodeId) addEdge(lastSpineNodeId, extraId, 'main');
+        lastSpineNodeId = extraId;
 
-    children.push({
-        id: exId,
-        width: NODE_SIZES.extra.width,
-        height: NODE_SIZES.extra.height,
-        labels: [{ text: ex.title }] as any,
-        properties: { type: 'extra' } as any
-    });
-
-    if (lastAnchorId) {
-      edges.push({
-          id: nextEdgeId(),
-          sources: [lastAnchorId],
-          targets: [exId]
-      });
-    }
-
-    lastAnchorId = exId;
-
-    ex.options?.forEach((opt) => {
-      const optNodeId = `option__${opt.id}`;
-      children.push({
-          id: optNodeId,
-          width: NODE_SIZES.option.width,
-          height: NODE_SIZES.option.height,
-          labels: [{ text: opt.title }] as any,
-          properties: { type: 'option', status: opt.status } as any
-      });
-      edges.push({
-          id: nextEdgeId(),
-          sources: [exId],
-          targets: [optNodeId]
-      });
-    });
-  });
-
-  (roadmapJson.relatedFields || []).forEach((rf) => {
-    const rfId = `related__${rf.id}`;
-
-    children.push({
-        id: rfId,
-        width: NODE_SIZES.related.width,
-        height: NODE_SIZES.related.height,
-        labels: [{ text: rf.title }] as any,
-        properties: { type: 'related' } as any
-    });
-
-    if (lastAnchorId) {
-        edges.push({
-            id: nextEdgeId(),
-            sources: [lastAnchorId],
-            targets: [rfId]
+        extra.options?.forEach(opt => {
+           const optId = `option__${opt.id}`;
+           addNode(optId, 'option', opt.title, NODE_SIZES.option, opt.status);
+           addEdge(extraId, optId, 'sub');
         });
-    }
-  });
+     });
+  }
 
-  const elkGraph: ElkNode = {
+  // (Do the same loop for relatedFields if you want them at the bottom)
+
+  return {
     id: 'root',
-    layoutOptions: {},
     children,
     edges
   };
-
-  return elkGraph;
 };

@@ -2,10 +2,12 @@ import { getRoadmapGraph } from '@/lib/goals/goals-api';
 import { useMemo } from 'react';
 import { useQuery } from "@tanstack/react-query";
 
+// --- Types ---
 type ELKEdge = {
   id: string;
   sources: string[];
   targets: string[];
+  properties?: { type?: 'main' | 'sub' };
   sections?: {
     startPoint: { x: number; y: number };
     endPoint: { x: number; y: number };
@@ -29,7 +31,7 @@ type ELKNode = {
 };
 
 interface RoadmapProps {
-  layout: ELKNode; // The root node
+  layout: ELKNode;
   width: number;
   height: number;
 }
@@ -43,34 +45,23 @@ const createRoundedPath = (
 ) => {
   const points = [start, ...(bends || []), end];
   let d = `M ${start.x} ${start.y}`;
-
-  if (points.length < 3) {
-    return `${d} L ${end.x} ${end.y}`;
-  }
+  if (points.length < 3) return `${d} L ${end.x} ${end.y}`;
 
   for (let i = 1; i < points.length - 1; i++) {
     const prev = points[i - 1];
     const curr = points[i];
     const next = points[i + 1];
 
-    // Calculate vectors
     const vecPrev = { x: curr.x - prev.x, y: curr.y - prev.y };
     const vecNext = { x: next.x - curr.x, y: next.y - curr.y };
-
-    // Normalize
     const lenPrev = Math.sqrt(vecPrev.x ** 2 + vecPrev.y ** 2);
     const lenNext = Math.sqrt(vecNext.x ** 2 + vecNext.y ** 2);
-
-    // Determine actual radius (don't exceed half the segment length)
     const r = Math.min(radius, lenPrev / 2, lenNext / 2);
 
-    // Start of the arc
     const startArc = {
       x: curr.x - (vecPrev.x / lenPrev) * r,
       y: curr.y - (vecPrev.y / lenPrev) * r,
     };
-
-    // End of the arc
     const endArc = {
       x: curr.x + (vecNext.x / lenNext) * r,
       y: curr.y + (vecNext.y / lenNext) * r,
@@ -79,48 +70,74 @@ const createRoundedPath = (
     d += ` L ${startArc.x} ${startArc.y}`;
     d += ` Q ${curr.x} ${curr.y} ${endArc.x} ${endArc.y}`;
   }
-
   d += ` L ${end.x} ${end.y}`;
   return d;
 };
 
-// --- Sub-Component: Node Renderer ---
-const NodeRenderer = ({
-  node,
-}: {
-  node: ELKNode;
-}) => {
+// --- Edge Renderer ---
+const EdgeRenderer = ({ edge }: { edge: ELKEdge }) => {
+  const isMain = edge.properties?.type === 'main';
+  // Lighter strokes for better aesthetics on light/dark modes
+  const strokeColor = isMain ? "#94a3b8" : "#cbd5e1";
+  const strokeWidth = isMain ? 3 : 2;
+  const strokeDash = isMain ? "" : "6,4";
+
+  return (
+    <>
+      {edge.sections?.map((section, idx) => (
+        <path
+          key={`${edge.id}-${idx}`}
+          d={createRoundedPath(section.startPoint, section.endPoint, section.bendPoints)}
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={strokeDash}
+          strokeLinecap="round"
+          className="transition-opacity duration-300"
+        />
+      ))}
+    </>
+  );
+};
+
+// --- Node Renderer ---
+const NodeRenderer = ({ node }: { node: ELKNode }) => {
   const { width = 0, height = 0, properties, labels } = node;
   const type = properties?.type;
   const label = labels?.[0]?.text || '';
 
-  // Define styles based on Node Type (Matches your dark theme request)
   const getNodeStyles = () => {
     switch (type) {
       case 'phase':
         return {
-          rectClass: 'fill-slate-900 stroke-slate-700 stroke-[2px]',
-          textClass: 'text-slate-200 font-bold text-lg uppercase tracking-wider',
-          rx: 8
+          // Transparent header style
+          rectClass: 'fill-transparent stroke-none',
+          textClass: 'text-slate-500 font-black text-xl uppercase tracking-widest',
+          rx: 0
         };
       case 'topic':
         return {
-          // Yellow accent for core topics (classic roadmap feel) or Slate for dark
-          rectClass: 'fill-slate-800 stroke-yellow-500/50 stroke-[2px] hover:stroke-yellow-400 transition-colors',
-          textClass: 'text-slate-100 font-semibold text-sm',
+          rectClass: 'fill-[#FFD700] stroke-yellow-600 stroke-[3px]',
+          textClass: 'text-slate-900 font-extrabold text-sm uppercase tracking-wide',
           rx: 6
         };
       case 'option':
         return {
-          rectClass: 'fill-slate-800 stroke-slate-600 stroke-[1px] hover:stroke-slate-400',
-          textClass: 'text-slate-400 text-xs',
+          rectClass: 'fill-[#F5F5DC] stroke-stone-400 stroke-1',
+          textClass: 'text-slate-700 text-xs font-semibold',
           rx: 4
         };
       case 'checkpoint':
         return {
-          rectClass: 'fill-indigo-900/30 stroke-indigo-500 stroke-[1px] stroke-dashed',
+          rectClass: 'fill-slate-800 stroke-indigo-500/50 stroke-[1px] stroke-dashed',
           textClass: 'text-indigo-300 text-xs italic',
-          rx: 20 // Pill shape
+          rx: 20
+        };
+      case 'extra':
+        return {
+           rectClass: 'fill-purple-100 stroke-purple-300 stroke-2',
+           textClass: 'text-purple-900 font-bold text-sm',
+           rx: 6
         };
       default:
         return {
@@ -134,28 +151,16 @@ const NodeRenderer = ({
   const styles = getNodeStyles();
 
   return (
-    <g
-      transform={`translate(${node.x || 0}, ${node.y || 0})`}
-      className="cursor-pointer group"
-      onClick={(e) => {
-        e.stopPropagation();
-        // onClick(node.id, type);
-      }}
-    >
-      {/* 1. The Shape */}
+    <g transform={`translate(${node.x || 0}, ${node.y || 0})`}>
+      {/* Main Node */}
       <rect
-        width={width}
-        height={height}
-        rx={styles.rx}
-        className={`${styles.rectClass} transition-all duration-200`}
+        width={width} height={height} rx={styles.rx}
+        className={styles.rectClass}
       />
 
-      {/* 2. The Text (Using HTML for perfect wrapping) */}
+      {/* Label */}
       <foreignObject width={width} height={height} style={{ pointerEvents: 'none' }}>
-        <div
-          className={`w-full h-full flex items-center justify-center p-2 text-center select-none ${styles.textClass}`}
-        >
-          {/* Clamp text to 2 lines to prevent heavy overflow */}
+        <div className={`w-full h-full flex items-center justify-center p-2 text-center select-none ${styles.textClass}`}>
           <span className="line-clamp-2 leading-tight">
             {label}
           </span>
@@ -167,65 +172,39 @@ const NodeRenderer = ({
 
 // --- Main Component ---
 export default function RoadmapSVG() {
-
-  const { data: roadmapData, isLoading, error  } = useQuery<RoadmapProps, Error>({
+  const { data: roadmapData, isLoading, error } = useQuery<RoadmapProps, Error>({
     queryKey: ['roadmapGraph'],
     queryFn: getRoadmapGraph,
+    refetchOnWindowFocus: false,
   });
 
   const nodes = useMemo(() => roadmapData?.layout.children || [], [roadmapData?.layout]);
   const edges = useMemo(() => roadmapData?.layout.edges || [], [roadmapData?.layout]);
 
-  if (isLoading) return <div className='py-24'>Loading...</div>
-  if (error) return <div className='py-24'>An error occured: {error.message}</div>
+  if (isLoading) return <div className='flex items-center justify-center h-full w-full text-slate-400 animate-pulse'>Generating Roadmap...</div>;
+  if (error) return <div className='flex items-center justify-center h-full w-full text-red-400'>Error loading roadmap</div>;
   if (!roadmapData) return null;
 
   const { width, height } = roadmapData;
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-slate-950">
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        className="block min-w-full min-h-full"
-      >
-        <defs>
-          {/* Optional: Add Arrowheads if you want directionality */}
-          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
-          </marker>
-        </defs>
-
-        {/* --- LAYER 1: EDGES --- */}
-        <g>
-          {edges.map((edge) =>
-            edge.sections?.map((section, idx) => (
-              <path
-                key={`${edge.id}-${idx}`}
-                d={createRoundedPath(section.startPoint, section.endPoint, section.bendPoints)}
-                fill="none"
-                stroke="#475569"
-                strokeWidth={2}
-                strokeLinecap="round" // Makes ends smooth
-                // markerEnd="url(#arrowhead)" // Uncomment if you want arrows
-                className="opacity-60"
-              />
-            ))
-          )}
-        </g>
-
-        {/* --- LAYER 2: NODES --- */}
-        <g>
-          {nodes.map((node) => (
-            <NodeRenderer
-              key={node.id}
-              node={node}
-              // onClick={onNodeClick || (() => {})}
-            />
-          ))}
-        </g>
-      </svg>
+    // Responsive Wrapper: Centers content and allows scrolling if needed
+    <div className="w-full h-full bg-slate-50 flex items-start justify-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300">
+      <div className="p-10" style={{ minWidth: width, minHeight: height }}>
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          className="block mx-auto" // mx-auto helps horizontal center within the min-width constraint
+        >
+          <g>
+            {edges.map((edge) => <EdgeRenderer key={edge.id} edge={edge} />)}
+          </g>
+          <g>
+            {nodes.map((node) => <NodeRenderer key={node.id} node={node} />)}
+          </g>
+        </svg>
+      </div>
     </div>
   );
 }

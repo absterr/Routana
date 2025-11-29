@@ -17,6 +17,7 @@ declare module "elkjs" {
     sources: string[];
     targets: string[];
     layoutOptions?: Record<string, string>;
+    properties?: Record<string, any>;
     sections?: {
       startPoint: { x: number; y: number };
       endPoint: { x: number; y: number };
