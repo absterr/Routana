@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { fromNodeHeaders } from "better-auth/node";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { ElkNode } from "elkjs";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
@@ -8,7 +8,6 @@ import { db } from "../db/drizzle.js";
 import { goal, phase, roadmap, starredResource } from "../db/models/goal.models.js";
 import { auth } from "../lib/auth.js";
 import env from "../lib/env.js";
-import mockRoadmap from "../mockRoadmap.js";
 import { goalSchema, roadmapSchema } from "./goal.schema.js";
 import { layoutGraph } from "./utils/elk.js";
 import { jsonToElk } from "./utils/jsonToElk.js";
@@ -108,19 +107,32 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Failed to generate roadmap content." });
     }
 
-    const roadmapJson = JSON.parse(response.text);
+    const responseJson = JSON.parse(response.text);
+    // ISSUE: IF THIS THROWS, THIS ENDPOINT WILL RETURN A 400
+    const roadmapJson = roadmapSchema.parse(responseJson);
+    const roadmapPhases = roadmapJson.phases;
 
-    const newGoal = await db.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       const [newGoal] = await tx
         .insert(goal)
         .values({ userId, ...goalDetails })
         .returning({ id: goal.id });
 
-      await tx.insert(roadmap).values({ goalId: newGoal.id, roadmapJson });
-      return newGoal;
-    })
+      await tx.insert(roadmap).values({ userId, goalId: newGoal.id, roadmapJson });
 
-    return res.status(200).json({ goalId: newGoal.id });
+      for (let i = 0; i < roadmapPhases.length; i++) {
+        const p = roadmapPhases[i];
+        await tx.insert(phase).values({
+          goalId: newGoal.id,
+          title: p.title,
+          status: p.status,
+          orderIndex: i
+        });
+      }
+    });
+
+    // WE CAN REDIRECT THE USER FROM HERE
+    return res.status(201).json({ message: "Created" });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: "Bad request" });
@@ -129,13 +141,32 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.get("/roadmap", async (req: Request, res: Response) => {
+goalRoutes.get("/goals/:id", async (req: Request, res: Response) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const userId = session.user.id;
+  const goalId = req.params.id
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    return res.status(400).json({ error: "Bad request" });
+  }
+
+
   try {
+    const [{ roadmapJson }] = await db.select({ roadmapJson: roadmap.roadmapJson })
+      .from(roadmap)
+      .where(and(eq(roadmap.userId, userId), eq(roadmap.goalId, goalId)))
+      .limit(1);
 
-    // Optional: validate roadmap with zod on the server (recommended)
-    const parsedRoadmap = roadmapSchema.parse(mockRoadmap);
+    if (!roadmapJson) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
 
-    const elkGraph = jsonToElk(parsedRoadmap);
+    const elkGraph = jsonToElk(roadmapJson);
     const layout = await layoutGraph(elkGraph);
 
     // Compute overall canvas size from layout children
@@ -155,7 +186,7 @@ goalRoutes.get("/roadmap", async (req: Request, res: Response) => {
     width += 40;
     height += 40;
 
-    return res.status(200).json({ layout, width, height });
+    return res.status(200).json({ layout, width, height, roadmapJson });
   } catch (err: any) {
     console.error(err)
     return res.status(500).json({ error: err.message || String(err) || "Internal server error" });

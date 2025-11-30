@@ -20,6 +20,7 @@ export const goal = pgTable("goal", {
 
 export const roadmap = pgTable("roadmap", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   goalId: uuid("goal_id").notNull().references(() => goal.id, { onDelete: "cascade" }),
   roadmapJson: jsonb("roadmapJson").$type<z.infer<typeof roadmapSchema>>().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
