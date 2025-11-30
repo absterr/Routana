@@ -14,17 +14,16 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut, useSession } from "@/lib/auth/auth-client";
+import { signOut } from "@/lib/auth/auth-client";
+import { useAuth } from "@/lib/auth/useAuth";
 import { useTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Skeleton } from "../ui/skeleton";
 
 const UserNav = () => {
   const [pending, startTransition] = useTransition();
-  const { data, isPending } = useSession();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const user = data?.user;
 
   const handleLogOut = () => {
     const logout = toast.loading("Logging out...");
@@ -42,10 +41,6 @@ const UserNav = () => {
       });
     });
   }
-
- if (isPending) {
-   return <Skeleton className="h-9 w-9 rounded-full" />
- }
 
 if (!user) {
   return null;

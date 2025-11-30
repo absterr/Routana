@@ -7,7 +7,7 @@ import type { Provider } from "@/lib/provider";
 import { type ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert } from "lucide-react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import type z from "zod";
 
 const SignupPage = () => {
   const [isPending, startTransition] = useTransition();
+  const [isFormPending, setFormPending] = useState(false);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -47,6 +48,7 @@ const SignupPage = () => {
   };
 
   const onSubmit = (formValues: z.infer<typeof signupSchema>) => {
+    setFormPending(true);
     startTransition(async () => {
       await signUp.email(
         {
@@ -63,6 +65,7 @@ const SignupPage = () => {
             });
           },
           onError: (ctx: ErrorContext) => {
+            setFormPending(false);
             switch (ctx.error.status) {
               case 422:
                 form.reset();
@@ -173,7 +176,7 @@ const SignupPage = () => {
               disabled={isPending}
               className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
             >
-              {isPending ? <LoadingSpinner /> : "Create account"}
+              {isFormPending ? <LoadingSpinner /> : "Create account"}
             </button>
           </div>
         </form>

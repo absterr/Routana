@@ -7,7 +7,7 @@ import type { Provider } from "@/lib/provider";
 import { type ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert } from "lucide-react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import type z from "zod";
 
 const LoginPage = () => {
   const [isPending, startTransition] = useTransition();
+  const [isFormPending, setFormPending] = useState(false);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -23,7 +24,6 @@ const LoginPage = () => {
       password: ""
     }
   });
-
 
   const handleSocialSignIn = (provider: Provider) => () => {
     startTransition(async () => {
@@ -46,6 +46,7 @@ const LoginPage = () => {
   };
 
   const onSubmit = (formValues: z.infer<typeof loginSchema>) => {
+    setFormPending(true);
     startTransition(async () => {
       await signIn.email(
         {
@@ -57,6 +58,7 @@ const LoginPage = () => {
             navigate("/", { replace: true });
           },
           onError: (ctx: ErrorContext) => {
+            setFormPending(false);
             switch (ctx.error.status) {
               case 400:
                 form.reset();
@@ -158,7 +160,7 @@ const LoginPage = () => {
             className="w-full h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700  disabled:bg-purple-400 hover:cursor-pointer font-semibold text-base transition-colors"
             disabled={isPending}
           >
-            {isPending ? <LoadingSpinner /> : "Log in"}
+            {isFormPending ? <LoadingSpinner /> : "Log in"}
           </button>
         </form>
 

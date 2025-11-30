@@ -1,8 +1,9 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useSession } from "@/lib/auth/auth-client";
+import AuthProvider from "@/lib/auth/AuthContext";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
-import { useSession } from "@/lib/auth/auth-client";
 
 const authRoutes = [
   "/login",
@@ -17,9 +18,9 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { data, isPending, isRefetching } = useSession();
 
   const session = data?.session;
+  const user = data?.user ?? null;
   const isAuthRoute = authRoutes.includes(pathname.replace(/\/$/, ""));
   const hasSession = !!(session);
-
   const isLoading = isPending || (isRefetching && !data);
 
   useEffect(() => {
@@ -41,12 +42,14 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
-      {!isAuthRoute && <Navbar hasSession={hasSession} />}
-      <main className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
-        {children}
-      </main>
-    </div>
+    <AuthProvider user={user}>
+      <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
+        {!isAuthRoute && <Navbar hasSession={hasSession} />}
+        <main className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
+          {children}
+        </main>
+      </div>
+    </AuthProvider>
   );
 }
 
