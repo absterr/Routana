@@ -1,40 +1,55 @@
+import LoadingSpinner from '@/components/LoadingSpinner';
 import type { ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph } from '@/lib/goals/goals-api';
 import { useQuery } from "@tanstack/react-query";
-import SVG from './svg';
+import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import SVG from './SVG';
 
-interface RoadmapDataProps {
+interface RoadmapData {
   layout: ELKNode;
   width: number;
   height: number;
 }
 
 const RoadmapPage = () => {
-  const { data: roadmapData, isLoading, error } = useQuery<RoadmapDataProps, Error>({
+  const { data: roadmapData, isLoading, error } = useQuery<RoadmapData, Error>({
     queryKey: ['roadmapGraph'],
     queryFn: getRoadmapGraph,
     refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
-    return <div
-      className='flex items-center justify-center h-full w-full text-slate-400 animate-pulse'>
-      Generating Roadmap...
-    </div>;
+    return <div className="min-h-screen flex items-center justify-center">
+      <LoadingSpinner size={8} />
+    </div>
   }
   if (error) {
     return <div
-      className='flex items-center justify-center h-full w-full text-red-400'>
+      className='min-h-screen flex items-center justify-center text-red-600 font-semibold text-2xl'>
       Error loading roadmap
     </div>;
   }
+
   if (!roadmapData) return null;
 
 
-  return <div>
+  return <section className='flex flex-col gap-y-2 items-center'>
+    <div className='pt-8 w-full max-w-2xl'>
+      <div className='bg-white rounded-xl border border-gray-200 flex flex-col gap-y-14 p-6'>
+        <Link to={"/goals"}
+          className='underline text-gray-500 hover:text-black transition-colors duration-150 flex items-center gap-x-1'>
+            <ArrowLeft className='w-5 h-5 -mb-0.5'/>
+            <span>View all goals</span>
+        </Link>
+        <header className='flex flex-col gap-y-2'>
+          <h2 className='text-3xl font-bold'>DevOps Learning Roadmap</h2>
+          <p className='text-gray-600'>Get familiar with tools like docker and Kubernetes</p>
+        </header>
+      </div>
+    </div>
     <SVG roadmapData={roadmapData}  />
-  </div>
-
+  </section>
 }
 
 export default RoadmapPage

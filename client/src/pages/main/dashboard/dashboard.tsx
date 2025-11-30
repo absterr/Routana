@@ -1,40 +1,66 @@
+import LoadingSpinner from "@/components/LoadingSpinner"
 import { Button } from "@/components/ui/button"
+import { getDashboardGoals } from "@/lib/goals/goals-api"
 import { cn } from "@/lib/utils"
-import { Plus, Rocket } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import { ArrowLeft, Plus, Rocket } from "lucide-react"
 import { Link } from "react-router-dom"
 import GoalPreview from "./GoalPreview"
 
-const mockGoals = [
-  {
-    id: 1,
-    title: "Become a full-stack developer",
-    description: "Master frontend and backend technologies",
-    progress: 45,
-    timeframe: "3 months",
-  },
-  {
-    id: 2,
-    title: "Learn React deeply",
-    description: "Master React hooks, context, and performance optimization",
-    progress: 60,
-    timeframe: "6 weeks",
-  },
-  {
-    id: 3,
-    title: "Build 5 portfolio projects",
-    description: "Create real-world projects for your portfolio",
-    progress: 20,
-    timeframe: "4 months",
-  },
-];
-
-const quickStats = [
-  { label: "Active Goals", value: "3" },
-  { label: "Total Progress", value: "42%" },
-  { label: "Completed", value: "12" },
-]
+interface DashboardGoal {
+    phases: {
+        title: string;
+        status: "Active" | "Pending" | "Completed";
+        orderIndex: number;
+    }[];
+    resources: {
+        title: string;
+        url: string;
+    }[];
+    id: string;
+    title: string;
+    description: string | null;
+    timeframe: string;
+    status: "Active" | "Pending" | "Completed";
+    progress: number;
+}
 
 const DashboardPage = () => {
+  const { data: dashboardGoals, isLoading, error } = useQuery<DashboardGoal[], Error>({
+    queryKey: ['dashboardGoals'],
+    queryFn: getDashboardGoals,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <LoadingSpinner size={7} />
+    </div>;
+  }
+
+  if (error) {
+    return <div
+      className='min-h-screen flex items-center justify-center text-red-600 font-semibold text-2xl'>
+      Error loading dashboard
+    </div>;
+  }
+
+  if (!dashboardGoals) return null;
+
+  const activeGoals = dashboardGoals
+    .filter((goal) => goal.status === "Active");
+  const totalProgress = activeGoals.length > 0
+    ? Math.round(activeGoals.reduce((sum, g) => sum + g.progress, 0) / activeGoals.length)
+    : 0;
+  const completed = dashboardGoals
+    .filter((goal) => goal.status === "Completed").length;
+
+  const quickStats = [
+    { label: "Active Goals", value: activeGoals.length },
+    { label: "Total Progress", value: `${totalProgress}%` },
+    { label: "Completed", value: completed },
+  ];
+
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6">Dashboard</h1>
@@ -64,7 +90,7 @@ const DashboardPage = () => {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Goals</h2>
           </div>
-          {mockGoals.length !== 0 &&
+          {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
               <Button className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2">
                 <Plus className="w-5 h-5" />
@@ -73,7 +99,7 @@ const DashboardPage = () => {
             </Link>
           }
         </div>
-        {mockGoals.length === 0 ? (
+        {dashboardGoals.length === 0 ? (
           <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
             <Rocket className="w-9 h-9" />
             <div className="text-center pb-2">
@@ -91,20 +117,52 @@ const DashboardPage = () => {
               </Button>
             </Link>
           </div>
-        ) :
-          <div className="bg-white rounded-xl border border-gray-200 transition-all duration-150">
-            <div className="flex flex-col gap-4">
-              {mockGoals.map((goal, i) => (
-                <div key={goal.id} className="px-6">
-                  <div className={cn("py-4 border-gray-200",
-                    { "border-b": i !== mockGoals.length - 1 }
-                  )}>
-                    <GoalPreview goal={goal} />
-                  </div>
-                </div>
-              ))}
+        ) : (
+          activeGoals.length === 0 ? (
+            <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
+              <Rocket className="w-9 h-9" />
+              <div className="text-center pb-2">
+                <h3 className="text-xl sm:text-2xl font-bold text-balance">No active goals yet</h3>
+                <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto pt-2">
+                  Activate your goals or create a new goal to get started
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <Link to={"/goals"}>
+                  <Button
+                    className="font-semibold rounded-xl hover:bg-gray-400 transition-colors inline-flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    View all goals
+                  </Button>
+                </Link>
+
+                <Link to={"/new-goal"}>
+                  <Button
+                    className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Create Your First Goal
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 transition-all duration-150">
+              <div className="flex flex-col gap-4">
+                {activeGoals.map((goal, i) => (
+                  <div key={goal.id} className="px-6">
+                    <div className={cn("py-4 border-gray-200",
+                      { "border-b": i !== activeGoals.length - 1 }
+                    )}>
+                      <GoalPreview goal={goal} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        )
         }
       </div>
     </section>

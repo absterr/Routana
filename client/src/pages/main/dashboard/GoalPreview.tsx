@@ -1,16 +1,28 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ArrowRight } from "lucide-react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 
-interface Goal {
-  id: number
-  title: string
-  description?: string
-  progress: number
-  timeframe: string
+
+interface DashboardGoal {
+    phases: {
+        title: string;
+        status: "Active" | "Pending" | "Completed";
+        orderIndex: number;
+    }[];
+    resources: {
+        title: string;
+        url: string;
+    }[];
+    id: string;
+    title: string;
+    description: string | null;
+    timeframe: string;
+    status: "Active" | "Pending" | "Completed";
+    progress: number;
 }
 
-const GoalPreview = ({ goal }: { goal: Goal }) => {
-  const { id, title, description, progress, timeframe } = goal;
+const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
+  const { id, title, description, phases, progress, timeframe } = goal;
   return (
     <Collapsible key={id} className="p-5">
       <CollapsibleTrigger className="w-full group text-left">
@@ -32,7 +44,7 @@ const GoalPreview = ({ goal }: { goal: Goal }) => {
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 pt-3">{timeframe} remaining</p>
+            <p className="text-xs text-gray-500 pt-3">{timeframe}</p>
           </div>
           <div className="shrink-0 text-purple-600">
             <ArrowRight
@@ -48,18 +60,22 @@ const GoalPreview = ({ goal }: { goal: Goal }) => {
             <h4 className="text-sm font-semibold text-gray-900 pb-3">Phases</h4>
             {/* Strikethrough if completed, highlight if in progress, greyed out if undone*/}
             <div className="flex flex-col gap-y-2">
-              {[
-                "Week 1-2: Fundamentals",
-                "Week 3-4: Core Concepts",
-                "Week 5-6: Projects",
-                "Week 7-8: Advanced Topics",
-              ].map((milestone, idx) => (
-                <div key={idx} className="flex items-center gap-3">
+              {phases.map(({ title, status, orderIndex }) => (
+                <div key={orderIndex} className="flex items-center gap-3">
                   <div
-                    className={`w-2 h-2 rounded-full ${idx < 2 ? "bg-purple-600" : "bg-gray-300"}`}
+                    className={cn("w-2 h-2 rounded-full", {
+                      "bg-purple-600": status === "Active",
+                      "bg-gray-300": status === "Pending",
+                      "bg-gray-300 line-through": status === "Completed"
+                    })}
                   ></div>
-                  <span className={`text-sm ${idx < 2 ? "text-gray-900 font-medium" : "text-gray-600"}`}>
-                    {milestone}
+                  <span className={cn("text-sm",{
+                      "text-gray-900 font-medium": status === "Active",
+                      "text-gray-600": status === "Pending",
+                      "text-gray-600 line-through": status === "Completed"
+                    }
+                  )}>
+                    {title}
                   </span>
                 </div>
               ))}

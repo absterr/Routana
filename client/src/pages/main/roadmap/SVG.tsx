@@ -16,7 +16,7 @@ const SVG = ({ roadmapData }: { roadmapData: RoadmapDataProps }) => {
 
   return (
     // Responsive Wrapper: Centers content and allows scrolling if needed
-    <div className="w-full h-full bg-slate-50 flex items-start justify-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300">
+    <div className="w-full h-full flex items-start justify-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300">
       <div className="p-10" style={{ minWidth: width, minHeight: height }}>
         <svg
           width={width}
