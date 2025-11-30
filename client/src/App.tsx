@@ -3,12 +3,12 @@ import NewGoalPage from "@/pages/main/new-goal";
 import RoadmapSVG from "@/pages/main/roadmap";
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
+import AuthWrapper from "./components/AuthWrapper/AuthWrapper";
 import ForgotPasswordPage from "./pages/auth/forgot-password";
 import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
 import GoalsPage from "./pages/main/goals";
-import AuthWrapper from "./components/AuthWrapper/AuthWrapper";
 
 export default function App() {
   return (
