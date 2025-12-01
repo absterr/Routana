@@ -54,6 +54,7 @@ const DashboardPage = () => {
     : 0;
   const completed = dashboardGoals
     .filter((goal) => goal.status === "Completed").length;
+  const hasNoGoals = dashboardGoals.length === 0;
 
   const quickStats = [
     { label: "Active Goals", value: activeGoals.length },
@@ -62,7 +63,7 @@ const DashboardPage = () => {
   ];
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6">Dashboard</h1>
 
       <div className="pb-12">
@@ -81,7 +82,14 @@ const DashboardPage = () => {
           </div>
         </div>
         <div className="py-4 px-1">
-          <Link to={"/goals"} className="underline text-gray-600 hover:text-purple-600 transition-colors duration-100">View all goals</Link>
+          {!hasNoGoals &&
+            <Link
+              to={"/goals"}
+              className="underline text-gray-600 hover:text-purple-600 transition-colors duration-100"
+            >
+              View all goals
+            </Link>
+          }
         </div>
       </div>
 
@@ -99,69 +107,51 @@ const DashboardPage = () => {
             </Link>
           }
         </div>
-        {dashboardGoals.length === 0 ? (
+        {activeGoals.length === 0 ? (
           <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
             <Rocket className="w-9 h-9" />
             <div className="text-center pb-2">
-              <h3 className="text-xl sm:text-2xl font-bold text-balance">No goals yet</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-balance">
+                {hasNoGoals ? "No goals yet" : "No active goals yet"}
+              </h3>
               <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto pt-2">
-                Create your first learning goal to get started on your growth journey
+                {hasNoGoals
+                  ? "Create your first learning goal to get started on your growth journey"
+                  : "Activate your goals or create a new goal to get started"
+                }
               </p>
             </div>
-            <Link to={"/new-goal"}>
+            <Link to={hasNoGoals ? "/new-goal" : "/goals"}>
               <Button
                 className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
               >
-                <Plus className="w-5 h-5" />
-                Create Your First Goal
+                {hasNoGoals
+                  ? <>
+                    <Plus className="w-5 h-5" />
+                    Create Your First Goal
+                  </>
+                  : <>
+                    <ArrowLeft className="w-5 h-5" />
+                    View All Goals
+                  </>
+                }
               </Button>
             </Link>
           </div>
         ) : (
-          activeGoals.length === 0 ? (
-            <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
-              <Rocket className="w-9 h-9" />
-              <div className="text-center pb-2">
-                <h3 className="text-xl sm:text-2xl font-bold text-balance">No active goals yet</h3>
-                <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto pt-2">
-                  Activate your goals or create a new goal to get started
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <Link to={"/goals"}>
-                  <Button
-                    className="font-semibold rounded-xl hover:bg-gray-400 transition-colors inline-flex items-center gap-2"
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                    View all goals
-                  </Button>
-                </Link>
-
-                <Link to={"/new-goal"}>
-                  <Button
-                    className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Create Your First Goal
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl border border-gray-200 transition-all duration-150">
-              <div className="flex flex-col gap-4">
-                {activeGoals.map((goal, i) => (
-                  <div key={goal.id} className="px-6">
-                    <div className={cn("py-4 border-gray-200",
-                      { "border-b": i !== activeGoals.length - 1 }
-                    )}>
-                      <GoalPreview goal={goal} />
-                    </div>
+          <div className="bg-white rounded-xl border border-gray-200 transition-all duration-150">
+            <div className="flex flex-col gap-4">
+              {activeGoals.map((goal, i) => (
+                <div key={goal.id} className="px-6">
+                  <div className={cn("py-4 border-gray-200",
+                    { "border-b": i !== activeGoals.length - 1 }
+                  )}>
+                    <GoalPreview goal={goal} />
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )
+          </div>
         )
         }
       </div>

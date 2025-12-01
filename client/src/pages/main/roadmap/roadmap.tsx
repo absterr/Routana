@@ -3,7 +3,7 @@ import type { ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph } from '@/lib/goals/goals-api';
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import SVG from './SVG';
 
 interface RoadmapData {
@@ -13,9 +13,11 @@ interface RoadmapData {
 }
 
 const RoadmapPage = () => {
+  const { id } = useParams();
   const { data: roadmapData, isLoading, error } = useQuery<RoadmapData, Error>({
-    queryKey: ['roadmapGraph'],
-    queryFn: getRoadmapGraph,
+    queryKey: ['roadmap', id],
+    enabled: !!id,
+    queryFn: () => getRoadmapGraph(id!),
     refetchOnWindowFocus: false,
   });
 
@@ -32,7 +34,6 @@ const RoadmapPage = () => {
   }
 
   if (!roadmapData) return null;
-
 
   return <section className='flex flex-col gap-y-2 items-center'>
     <div className='pt-8 w-full max-w-2xl'>

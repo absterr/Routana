@@ -1,4 +1,5 @@
 import { z } from "zod";
+import CustomError from "../CustomError";
 import type { newGoalSchema } from "./goals-schema";
 
 export const getDashboardGoals = async () => {
@@ -9,7 +10,7 @@ export const getDashboardGoals = async () => {
 
  const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.error || "Failed to load dashboard");
+    throw new CustomError(data.error || "Failed to load dashboard", res.status);
   }
 
   return data.goals ?? [];
@@ -26,19 +27,27 @@ export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) 
   });
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to generate roadmap");
+  if (!res.ok) {
+    throw new CustomError(data.error || "Failed to generate roadmap", res.status);
+  }
 
   return {
     goalId: data.goalId ?? ""
   }
 }
 
-export const getRoadmapGraph = async () => {
-  const res = await fetch("/api/roadmap", {
+export const getRoadmapGraph = async (goalId: string) => {
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    throw new Error("Invalid goal ID");
+  }
+
+  const res = await fetch(`/api/goals/${goalId}`, {
     method: "GET",
     credentials: "include"
   });
 
-  if (!res.ok) throw new Error("Failed to get roadmap graph");
+  const data = await res.json();
+
+  if (!res.ok) throw new CustomError(data.error || "Failed to get roadmap layout", res.status);
   return res.json();
 }

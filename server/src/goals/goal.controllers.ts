@@ -20,7 +20,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
-  if (!session) return res.status(401).json({ error: "Unauthorized" });
+  if (!session) return res.status(401).json({ error: "Invalid session" });
 
   try {
     const userId = session.user.id;
@@ -38,7 +38,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
 
     const phases = await db
       .select({
-        goalId: starredResource.goalId,
+        goalId: phase.goalId,
         phaseTitle: phase.title,
         phaseStatus: phase.status,
         phaseOrderIndex: phase.orderIndex,
@@ -76,7 +76,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
 
     return res.status(200).json({ goals: result });
   } catch (err) {
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Failed to fetch user goals" });
   }
 });
 
@@ -84,13 +84,13 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
-  if (!session) return res.status(401).json({ error: "Unauthorized" });
+  if (!session) return res.status(401).json({ error: "Invalid session" });
 
-  const userId = session.user.id;
   const baseSchema = z.toJSONSchema(roadmapSchema);
   delete baseSchema.$schema;
 
   try {
+    const userId = session.user.id;
     const goalDetails = goalSchema.parse(req.body);
     const response = await genAI.models.generateContent({
       model: "gemini-2.5-pro",
@@ -112,7 +112,7 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
     const roadmapJson = roadmapSchema.parse(responseJson);
     const roadmapPhases = roadmapJson.phases;
 
-    await db.transaction(async (tx) => {
+    const newGoalId = await db.transaction(async (tx) => {
       const [newGoal] = await tx
         .insert(goal)
         .values({ userId, ...goalDetails })
@@ -129,15 +129,17 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
           orderIndex: i
         });
       }
+
+      return newGoal.id;
     });
 
     // WE CAN REDIRECT THE USER FROM HERE
-    return res.status(201).json({ message: "Created" });
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Bad request" });
+    return res.status(201).json({ goalId: newGoalId });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid user request" });
     }
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Failed to generate roadmap"});
   }
 });
 
@@ -152,9 +154,8 @@ goalRoutes.get("/goals/:id", async (req: Request, res: Response) => {
   const userId = session.user.id;
   const goalId = req.params.id
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
-    return res.status(400).json({ error: "Bad request" });
+    return res.status(400).json({ error: "Invalid goal ID" });
   }
-
 
   try {
     const [{ roadmapJson }] = await db.select({ roadmapJson: roadmap.roadmapJson })
@@ -187,9 +188,8 @@ goalRoutes.get("/goals/:id", async (req: Request, res: Response) => {
     height += 40;
 
     return res.status(200).json({ layout, width, height, roadmapJson });
-  } catch (err: any) {
-    console.error(err)
-    return res.status(500).json({ error: err.message || String(err) || "Internal server error" });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to get roadmap layout"});
   }
 });
 

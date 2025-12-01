@@ -44,7 +44,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthProvider user={user}>
       <div className="w-full h-screen grid grid-rows-[auto, 1fr]">
-        {!isAuthRoute && <Navbar hasSession={hasSession} />}
+          {!isAuthRoute && <Navbar hasSession={hasSession} />}
         <main className="overflow-y-auto scroll-smooth bg-linear-to-br from-gray-50 to-gray-100">
           {children}
         </main>

@@ -1,6 +1,6 @@
 import DashboardPage from "@/pages/main/dashboard";
 import NewGoalPage from "@/pages/main/new-goal";
-import RoadmapSVG from "@/pages/main/roadmap";
+import Roadmap from "@/pages/main/roadmap";
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import AuthWrapper from "./components/AuthWrapper/AuthWrapper";
@@ -21,7 +21,7 @@ export default function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/roadmap" element={<RoadmapSVG />} />
+            <Route path="/goals/:id" element={<Roadmap />} />
             <Route path="/goals" element={<GoalsPage />} />
           </Routes>
         </AuthWrapper>
