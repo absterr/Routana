@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const goalSchema = z.object({
+export const newGoalSchema = z.object({
   title: z.string().min(3, "Goal title is required").max(60, "Goal title length exceeded"),
   description: z.string().max(230, "Goal description length exceeded").optional(),
   timeframe: z.enum(["1-month", "3-months", "6-months", "1-year", "Flexible"])
@@ -31,12 +31,12 @@ const topicSchema = z.object({
     status: z.enum(["Pending", "Progress", "Completed", "Skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A detailed explanation of what the topic covers."),
     resources: z.array(resourceSchema).describe("A list of recommended materials for this topic."),
-    options: z.array(optionSchema).describe("Alternative or more specialized options, concepts, paths or tools.").optional(),
+    options: z.array(optionSchema).describe("Alternative or more specialized options, concepts, paths or tools").optional(),
 });
 
 const phaseSchema = z.object({
     id: z.string().describe("A unique UUID for the phase."),
-    title: z.string().describe("The phase name (e.g., 'Foundations')."),
+    title: z.string().describe("The phase name (e.g., 'Foundations'). Don't include 'Phase x:' in the name ie., 'Phase 1: Foundations', just 'Foundations' is excellent."),
     description: z.string().describe("A brief summary of the goals for this phase."),
     status: z.enum(["Active", "Pending", "Completed"]).describe("State of phase completion Initial state is pending."),
     topics: z.array(topicSchema).describe("The collection of learning topics within this phase."),
@@ -53,7 +53,7 @@ const extraSchema = z.object({
     id: z.string().describe("A unique UUID for the extra item."),
     title: z.string().describe("Title of the extra topic (e.g., 'Web Performance')."),
     status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
-    about: z.string().describe("Explanation of the extra topic."),
+    about: z.string().describe("A detailed explanation of the extra topic."),
     resources: z.array(resourceSchema).describe("Materials for the extra topic."),
     options: z.array(optionSchema).describe("Any alternative sub-paths for the extra topic (eg., 'Vitest' in this case)"),
 });
@@ -63,18 +63,26 @@ const relatedFieldSchema = z.object({
     title: z.string().describe("Title of the related field (e.g., 'Backend Development').")
 });
 
+const faqSchema = z.object({
+    id: z.string().describe("A unique UUID for the FAQ item."),
+    question: z.string().describe("The frequently asked question."),
+    answer: z.string().describe("The clear and concise answer to the question.")
+});
+
 
 export const roadmapSchema = z.object({
     meta: z.object({
         title: z.string().describe("The title of the generated roadmap (e.g., 'Frontend Developer Roadmap')."),
+        description: z.string().describe("A very brief description of the generated roadmap (e.g., 'A guide to becoming a modern frontend developer...)')."),
         userContext: z.object({
             experience: z.string().nullable().describe("The user's stated experience level."),
             notes: z.string().nullable().describe("Specific focus notes provided by the user.")
         })
     }),
-
+    progress: z.string().describe("The current progress the user has made with the roadmap. Always set this to 0").default("0"),
     phases: z.array(phaseSchema).describe("The main, sequential learning steps."),
     checkpoints: z.array(checkpointSchema).describe("Milestones to measure progress."),
     extras: z.array(extraSchema).describe("Supplementary topics outside the core path."),
-    relatedFields: z.array(relatedFieldSchema).describe("Other areas of development related to the main goal.")
+    relatedFields: z.array(relatedFieldSchema).describe("Other areas of development related to the main goal."),
+    faqs: z.array(faqSchema).describe("A list of exactly ten most frequently asked questions and their answers relevant to this field.")
 });

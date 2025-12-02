@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { fromNodeHeaders } from "better-auth/node";
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { ElkNode } from "elkjs";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
@@ -8,13 +8,14 @@ import { db } from "../db/drizzle.js";
 import { goal, phase, roadmap, starredResource } from "../db/models/goal.models.js";
 import { auth } from "../lib/auth.js";
 import env from "../lib/env.js";
-import { goalSchema, roadmapSchema } from "./goal.schema.js";
+import { newGoalSchema, roadmapSchema } from "./goal.schema.js";
 import { layoutGraph } from "./utils/elk.js";
 import { jsonToElk } from "./utils/jsonToElk.js";
 import { ROADMAP_SYSTEM_PROMPT, ROADMAP_USER_PROMPT } from "./utils/prompt.js";
 
 const goalRoutes = Router();
 const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+const { userId, createdAt, updatedAt, ...rest } = getTableColumns(goal);
 
 goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
   const session = await auth.api.getSession({
@@ -22,19 +23,13 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
   });
   if (!session) return res.status(401).json({ error: "Invalid session" });
 
+  const currentUserId = session.user.id;
+
   try {
-    const userId = session.user.id;
     const goals = await db
-      .select({
-        id: goal.id,
-        title: goal.title,
-        description: goal.description,
-        timeframe: goal.timeframe,
-        status: goal.status,
-        progress: goal.progress,
-      })
+      .select(rest)
       .from(goal)
-      .where(eq(goal.userId, userId));
+      .where(eq(goal.userId, currentUserId));
 
     const phases = await db
       .select({
@@ -45,7 +40,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
       })
       .from(phase)
       .innerJoin(goal, eq(phase.goalId, goal.id))
-      .where(eq(goal.userId, userId));
+      .where(eq(goal.userId, currentUserId));
 
     const resources = await db
       .select({
@@ -55,7 +50,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
       })
       .from(starredResource)
       .innerJoin(goal, eq(starredResource.goalId, goal.id))
-      .where(eq(goal.userId, userId));
+      .where(eq(goal.userId, currentUserId));
 
     const result = goals.map(g => ({
       ...g,
@@ -86,12 +81,12 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   });
   if (!session) return res.status(401).json({ error: "Invalid session" });
 
+  const currentUserId = session.user.id;
   const baseSchema = z.toJSONSchema(roadmapSchema);
   delete baseSchema.$schema;
 
   try {
-    const userId = session.user.id;
-    const goalDetails = goalSchema.parse(req.body);
+    const goalDetails = newGoalSchema.parse(req.body);
     const response = await genAI.models.generateContent({
       model: "gemini-2.5-pro",
       contents: ROADMAP_USER_PROMPT(goalDetails),
@@ -120,10 +115,17 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
     const newGoalId = await db.transaction(async (tx) => {
       const [newGoal] = await tx
         .insert(goal)
-        .values({ userId, ...goalDetails })
+        .values({
+          ...goalDetails,
+          userId: currentUserId
+        })
         .returning({ id: goal.id });
 
-      await tx.insert(roadmap).values({ userId, goalId: newGoal.id, roadmapJson });
+      await tx.insert(roadmap).values({
+        userId: currentUserId,
+        goalId: newGoal.id,
+        roadmapJson
+      });
 
       for (let i = 0; i < roadmapPhases.length; i++) {
         const p = roadmapPhases[i];
@@ -148,24 +150,45 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   }
 });
 
+goalRoutes.get("/goals", async (req: Request, res: Response) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) {
+    return res.status(401).json({ error: "Invalid session" });
+  }
+
+  const currentUserId = session.user.id;
+
+  try {
+    const userGoals = await db.select(rest).
+      from(goal)
+      .where(eq(goal.userId, currentUserId));
+
+    return res.status(200).json({ goals: userGoals });
+  } catch (err) {
+    return res.status(500).json({ error: "Unable to fetch user goals" });
+  }
+});
+
 goalRoutes.get("/goals/:id", async (req: Request, res: Response) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
   if (!session) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: "Invalid session" });
   }
 
-  const userId = session.user.id;
-  const goalId = req.params.id
-  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+  const currentUserId = session.user.id;
+  const currentGoalId = req.params.id
+  if (!/^[0-9a-fA-F-]{36}$/.test(currentGoalId)) {
     return res.status(400).json({ error: "Invalid goal ID" });
   }
 
   try {
     const [{ roadmapJson }] = await db.select({ roadmapJson: roadmap.roadmapJson })
       .from(roadmap)
-      .where(and(eq(roadmap.userId, userId), eq(roadmap.goalId, goalId)))
+      .where(and(eq(roadmap.userId, currentUserId), eq(roadmap.goalId, currentGoalId)))
       .limit(1);
 
     if (!roadmapJson) {
