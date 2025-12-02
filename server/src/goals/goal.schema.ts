@@ -8,17 +8,17 @@ export const goalSchema = z.object({
 
 const resourceSchema = z.object({
     id: z.string().describe("A unique UUID for the resource."),
-    type: z.enum(["video", "article", "course", "documentation"]).describe("The type of the resource."),
+    type: z.enum(["Video", "Article", "Course", "Documentation"]).describe("The type of the resource."),
     title: z.string().describe("The title of the resource."),
     url: z.url().describe("The web address of the resource. Must be a valid URL."),
-    category: z.enum(["free", "paid"]).describe("The price category in which the resource falls under.")
+    category: z.enum(["Free", "Paid"]).describe("The price category in which the resource falls under.")
 });
 
 const optionSchema = z.object({
     id: z.string().describe("A unique UUID for the sub-topic."),
     title: z.string().describe("The title of the sub-topic (e.g., 'React')."),
-    type: z.enum(["core", "optional"]).describe("Whether the sub-topic is essential (core) or supplementary (optional)."),
-    status: z.enum(["pending", "progress", "completed", "skipped"]).describe("State of topic/concept completion Initial state is pending."),
+    type: z.enum(["Core", "Optional"]).describe("Whether the sub-topic is essential (core) or supplementary (optional)."),
+    status: z.enum(["Pending", "Progress", "Completed", "Skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A detailed explanation of what the sub-topic covers."),
     resources: z.array(resourceSchema).describe("A list of links or materials for this sub-topic."),
     // NOTE: options array is intentionally omitted here to prevent infinite recursion
@@ -27,7 +27,7 @@ const optionSchema = z.object({
 const topicSchema = z.object({
     id: z.string().describe("A unique UUID for the topic."),
     title: z.string().describe("The title of the topic (e.g., 'Javascript')."),
-    type: z.enum(["core", "optional"]).describe("Whether the topic is essential (core) or supplementary (optional)."),
+    type: z.enum(["Core", "Optional"]).describe("Whether the topic is essential (core) or supplementary (optional)."),
     status: z.enum(["Pending", "Progress", "Completed", "Skipped"]).describe("State of topic/concept completion Initial state is pending."),
     about: z.string().describe("A detailed explanation of what the topic covers."),
     resources: z.array(resourceSchema).describe("A list of recommended materials for this topic."),

@@ -107,9 +107,14 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Failed to generate roadmap content." });
     }
 
-    const responseJson = JSON.parse(response.text);
-    // ISSUE: IF THIS THROWS, THIS ENDPOINT WILL RETURN A 400
-    const roadmapJson = roadmapSchema.parse(responseJson);
+    let roadmapJson: z.infer<typeof roadmapSchema>;
+    try {
+      const responseJson = JSON.parse(response.text);
+      roadmapJson = roadmapSchema.parse(responseJson);
+    } catch (err) {
+      return res.status(500).json({ error: "Invalid roadmap generated" });
+    }
+
     const roadmapPhases = roadmapJson.phases;
 
     const newGoalId = await db.transaction(async (tx) => {
@@ -133,13 +138,13 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
       return newGoal.id;
     });
 
-    // WE CAN REDIRECT THE USER FROM HERE
     return res.status(201).json({ goalId: newGoalId });
-  } catch (err) {
+  } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });
     }
-    return res.status(500).json({ error: "Failed to generate roadmap"});
+
+    return res.status(500).json({ error: "Failed to generate/persist roadmap"});
   }
 });
 
