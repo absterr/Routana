@@ -4,8 +4,6 @@ const NodeRenderer = ({ node, onClick }: { node: ELKNode, onClick: () => void })
   const { width = 0, height = 0, properties, labels } = node;
   const type = properties?.type;
   const label = labels?.[0]?.text || '';
-
-
   const styles = getNodeStyles(type);
 
   return (

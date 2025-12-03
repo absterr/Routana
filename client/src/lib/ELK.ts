@@ -70,7 +70,6 @@ export const getNodeStyles = (type: string | undefined) => {
   switch (type) {
     case 'phase':
       return {
-        // Transparent header style
         rectClass: 'fill-transparent stroke-none',
         textClass: 'text-slate-500 font-black text-xl uppercase tracking-widest',
         rx: 0
@@ -95,9 +94,9 @@ export const getNodeStyles = (type: string | undefined) => {
       };
     case 'extra':
       return {
-         rectClass: 'fill-purple-100 stroke-purple-300 stroke-2',
-         textClass: 'text-purple-900 font-bold text-sm',
-         rx: 6
+        rectClass: 'fill-purple-100 stroke-purple-300 stroke-2',
+        textClass: 'text-purple-900 font-bold text-sm',
+        rx: 6
       };
     default:
       return {

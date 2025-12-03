@@ -16,6 +16,20 @@ export const getDashboardGoals = async () => {
   return data.goals ?? [];
 }
 
+export const getAllGoals = async () => {
+  const res = await fetch("/api/goals", {
+    method: "GET",
+    credentials: "include"
+  });
+
+ const data = await res.json();
+  if (!res.ok) {
+    throw new CustomError(data.error || "Failed to get goals", res.status);
+  }
+
+  return data.goals ?? [];
+}
+
 export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
   const res = await fetch("/api/new-goal", {
     method: "POST",

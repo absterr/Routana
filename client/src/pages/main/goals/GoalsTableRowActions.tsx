@@ -8,8 +8,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import { Link } from "react-router-dom";
 
-export default function GoalsTableRowActions() {
+export default function GoalsTableRowActions({ id }: { id: string }) {
 
   return (
     <DropdownMenu>
@@ -23,9 +24,13 @@ export default function GoalsTableRowActions() {
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Open roadmap</DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
+      <DropdownMenuContent align="end" className="w-40">
+        <Link to={`/goals/${id}`}>
+            <DropdownMenuItem>
+              Open roadmap
+            </DropdownMenuItem>
+          </Link>
+        <DropdownMenuItem>Change status</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
           Delete

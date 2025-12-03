@@ -1,11 +1,17 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
-import { statuses } from "./status";
+import { statuses } from "./goalStatus";
 import GoalsTableColumnHeader from "./GoalsTableColumnHeader";
 import GoalsTableRowActions from "./GoalsTableRowActions";
-import { type Task } from "./schema";
 
-const columns: ColumnDef<Task>[] = [
+interface Goal {
+  id: string;
+  title: string;
+  description: string | undefined;
+  status: "Active" | "Pending" | "Completed";
+}
+
+const columns: ColumnDef<Goal>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -16,7 +22,7 @@ const columns: ColumnDef<Task>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     cell: ({ row }) => (
@@ -24,7 +30,7 @@ const columns: ColumnDef<Task>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     enableSorting: false,
@@ -37,7 +43,7 @@ const columns: ColumnDef<Task>[] = [
         <GoalsTableColumnHeader column={column} title="Title" />
       </div>
     ),
-    cell: ({ row }) => <div className="w-[240px] px-2 truncate">{row.getValue("title")}</div>,
+    cell: ({ row }) => <div className="w-60 px-2 truncate">{row.getValue("title")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -89,7 +95,7 @@ const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-    cell: () => <GoalsTableRowActions />,
+    cell: ({ row }) => <GoalsTableRowActions id={row.original.id} />,
   },
 ]
 

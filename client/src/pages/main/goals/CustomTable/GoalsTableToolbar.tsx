@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { type Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
-import { statuses } from "../status";
+import { Link } from "react-router-dom";
+import { statuses } from "../goalStatus";
 import GoalsTableFacetedFilter from "./GoalsTableFacetedFilter";
 import GoalsTableViewOptions from "./GoalsTableViewOptions";
 
@@ -44,7 +45,12 @@ export default function GoalsTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <GoalsTableViewOptions table={table} />
-        <Button size="sm">New Goal</Button>
+        <Link to={"/new-goal"}>
+          <Button
+            size="sm"
+            className="hover:cursor-pointer bg-purple-600 hover:bg-purple-700"
+          >New Goal</Button>
+        </Link>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import {
-    CheckCircle,
-    Circle,
-    Timer
+  CheckCircle,
+  Circle,
+  Timer
 } from "lucide-react"
 
 export const statuses = [
