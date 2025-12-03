@@ -49,5 +49,5 @@ export const getRoadmapGraph = async (goalId: string) => {
   const data = await res.json();
 
   if (!res.ok) throw new CustomError(data.error || "Failed to get roadmap layout", res.status);
-  return res.json();
+  return data ?? {};
 }

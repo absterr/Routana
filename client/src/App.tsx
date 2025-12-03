@@ -21,8 +21,8 @@ export default function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/goals/:id" element={<Roadmap />} />
             <Route path="/goals" element={<GoalsPage />} />
+            <Route path="/goals/:id" element={<Roadmap />} />
           </Routes>
         </AuthWrapper>
       <Toaster

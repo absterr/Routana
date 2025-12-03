@@ -5,11 +5,11 @@ import NodeRenderer from "./NodeRenderer";
 
 interface RoadmapDataProps {
   layout: ELKNode;
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 
-const SVG = ({ roadmapData }: { roadmapData: RoadmapDataProps }) => {
+const SVG = ({ roadmapData, onNodeClick }: { roadmapData: RoadmapDataProps, onNodeClick: (n: ELKNode) => void }) => {
   const { layout, width, height } = roadmapData;
   const nodes = useMemo(() => layout.children || [], [layout]);
   const edges = useMemo(() => layout.edges || [], [layout]);
@@ -28,7 +28,7 @@ const SVG = ({ roadmapData }: { roadmapData: RoadmapDataProps }) => {
             {edges.map((edge) => <EdgeRenderer key={edge.id} edge={edge} />)}
           </g>
           <g>
-            {nodes.map((node) => <NodeRenderer key={node.id} node={node} />)}
+            {nodes.map((node) => <NodeRenderer key={node.id} node={node} onClick={() => {onNodeClick(node)}} />)}
           </g>
         </svg>
       </div>

@@ -1,3 +1,6 @@
+import type { roadmapSchema } from "./goals/goals-schema";
+import { z } from "zod";
+
 export type ELKEdge = {
   id: string;
   sources: string[];
@@ -102,5 +105,31 @@ export const getNodeStyles = (type: string | undefined) => {
         textClass: 'text-slate-300',
         rx: 4
       };
+  }
+};
+
+export const findEntry = (node: ELKNode | null, roadmapJson: z.infer<typeof roadmapSchema>) => {
+  if (!node) return null;
+
+  const label = node.labels?.[0]?.text || "";
+  const type = node.properties?.type;
+
+  switch (type) {
+    case 'phase':
+    return roadmapJson.phases.find(p => p.title === label);
+
+    case 'topic':
+    return roadmapJson.phases
+      .flatMap(p => p.topics).find(t => t.title === label)
+
+    case 'option':
+    return roadmapJson.phases
+      .flatMap(p => p.topics.flatMap(t => t.options || []))
+      .find(o => o.title === label);
+
+    case 'extra':
+      return roadmapJson.extras.find(e => e.title === label);
+
+    default: return null;
   }
 };

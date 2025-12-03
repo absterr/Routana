@@ -1,6 +1,6 @@
 import { type ELKNode, getNodeStyles } from "@/lib/ELK";
 
-const NodeRenderer = ({ node }: { node: ELKNode }) => {
+const NodeRenderer = ({ node, onClick }: { node: ELKNode, onClick: () => void }) => {
   const { width = 0, height = 0, properties, labels } = node;
   const type = properties?.type;
   const label = labels?.[0]?.text || '';
@@ -9,7 +9,10 @@ const NodeRenderer = ({ node }: { node: ELKNode }) => {
   const styles = getNodeStyles(type);
 
   return (
-    <g transform={`translate(${node.x || 0}, ${node.y || 0})`}>
+    <g
+      onClick={onClick}
+      className="cursor-pointer hover:opacity-80 transition"
+      transform={`translate(${node.x || 0}, ${node.y || 0})`}>
       {/* Main Node */}
       <rect
         width={width} height={height} rx={styles.rx}

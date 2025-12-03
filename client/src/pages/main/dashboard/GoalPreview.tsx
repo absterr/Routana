@@ -1,6 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 interface DashboardGoal {
@@ -22,7 +24,8 @@ interface DashboardGoal {
 }
 
 const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
-  const { id, title, description, phases, progress, timeframe } = goal;
+  const { id, title, description, phases, progress, resources, timeframe } = goal;
+
   return (
     <Collapsible key={id} className="p-5">
       <CollapsibleTrigger className="w-full group text-left">
@@ -81,24 +84,32 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
               ))}
             </div>
           </div>
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 pb-3">Starred resources</h4>
-            <div className="flex flex-col gap-y-2">
-              {["Interactive Courses", "Video Tutorials", "Documentation", "Practice Projects"].map(
-                (resource, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer"
-                  >
-                    {/*An icon instead of this dot describing what type of resource is it */}
-                    <div className="w-2 h-2 rounded-full bg-purple-600"></div>
-                    <span className="text-sm text-gray-700 flex-1">{resource}</span>
-                    <span className="text-xs text-gray-400">→</span>
-                  </div>
-                ),
-              )}
+          {resources.length > 0 &&
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 pb-3">Starred resources</h4>
+              <div className="flex flex-col gap-y-2">
+                {resources.map(
+                  (resource, idx) => (
+                    <a
+                      key={idx}
+                      href={resource.url}
+                      className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer"
+                    >
+                      {/*An icon instead of this dot describing what type of resource is it */}
+                      <div className="w-2 h-2 rounded-full bg-purple-600"></div>
+                      <span className="text-sm text-gray-700 flex-1">{resource.title}</span>
+                      <span className="text-xs text-gray-400">→</span>
+                    </a>
+                  ),
+                )}
+              </div>
             </div>
-          </div>
+          }
+        </div>
+        <div className="pt-10">
+          <Link to={`/goals/${id}`} className="text-sm">
+            <Button variant={"outline"} className="shadow-none">View roadmap</Button>
+          </Link>
         </div>
       </CollapsibleContent>
     </Collapsible>
