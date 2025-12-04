@@ -37,7 +37,7 @@ const topicSchema = z.object({
 const phaseSchema = z.object({
     id: z.string().describe("A unique UUID for the phase."),
     title: z.string().describe("The phase name (e.g., 'Foundations'). Don't include 'Phase x:' in the name ie., 'Phase 1: Foundations', just 'Foundations' is excellent."),
-    description: z.string().describe("A brief summary of the goals for this phase."),
+    about: z.string().describe("A brief summary of the goals for this phase."),
     status: z.enum(["Active", "Pending", "Completed"]).describe("State of phase completion Initial state is pending."),
     topics: z.array(topicSchema).describe("The collection of learning topics within this phase."),
 });
@@ -46,7 +46,7 @@ const checkpointSchema = z.object({
     id: z.string().describe("A unique UUID for the checkpoint."),
     phaseId: z.string().describe("The ID of the phase this checkpoint completes."),
     "for": z.string().describe("The phase label for which the checkpoint is for (e.g., 'Foundations')."),
-    description: z.string().describe("What the user should be able to do at this point."),
+    about: z.string().describe("What the user should be able to do at this point."),
 });
 
 const extraSchema = z.object({
@@ -73,7 +73,7 @@ const faqSchema = z.object({
 export const roadmapSchema = z.object({
     meta: z.object({
         title: z.string().describe("The title of the generated roadmap (e.g., 'Frontend Developer Roadmap')."),
-        description: z.string().describe("A very brief description of the generated roadmap (e.g., 'A guide to becoming a modern frontend developer...)')."),
+        about: z.string().describe("A very brief description of the generated roadmap (e.g., 'A guide to becoming a modern frontend developer...)')."),
         userContext: z.object({
             experience: z.string().nullable().describe("The user's stated experience level."),
             notes: z.string().nullable().describe("Specific focus notes provided by the user.")

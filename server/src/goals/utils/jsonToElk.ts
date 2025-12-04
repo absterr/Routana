@@ -3,10 +3,10 @@ import { z } from "zod";
 import { roadmapSchema } from "../goal.schema.js";
 
 const NODE_SIZES = {
-  phase: { width: 300, height: 60 },
+  phase: { width: 300, height: 80 },
   topic: { width: 180, height: 50 },
   option: { width: 150, height: 40 },
-  checkpoint: { width: 250, height: 40 },
+  checkpoint: { width: 320, height: 100 },
   extra: { width: 180, height: 50 },
   related: { width: 160, height: 40 },
 };
@@ -72,7 +72,7 @@ export const jsonToElk = (roadmapJson: z.infer<typeof roadmapSchema>): ElkNode =
     const phaseCheckpoints = roadmapJson.checkpoints.filter(cp => cp.phaseId === phase.id);
     phaseCheckpoints.forEach(cp => {
       const cpId = `checkpoint__${cp.id}`;
-      addNode(cpId, 'checkpoint', cp.description, NODE_SIZES.checkpoint);
+      addNode(cpId, 'checkpoint', cp.about, NODE_SIZES.checkpoint);
 
       if (lastSpineNodeId) {
         addEdge(lastSpineNodeId, cpId, 'main');
@@ -82,19 +82,28 @@ export const jsonToElk = (roadmapJson: z.infer<typeof roadmapSchema>): ElkNode =
   });
 
   if (roadmapJson.extras && roadmapJson.extras.length > 0) {
-     roadmapJson.extras.forEach(extra => {
-        const extraId = `extra__${extra.id}`;
-        addNode(extraId, 'extra', extra.title, NODE_SIZES.extra, extra.status);
+    const extrasHeaderId = "phase__extras";
+    addNode(extrasHeaderId, 'phase', "Extras", NODE_SIZES.phase);
 
-        if (lastSpineNodeId) addEdge(lastSpineNodeId, extraId, 'main');
-        lastSpineNodeId = extraId;
+    if (lastSpineNodeId) {
+      addEdge(lastSpineNodeId, extrasHeaderId, 'main');
+    }
 
-        extra.options?.forEach(opt => {
-           const optId = `option__${opt.id}`;
-           addNode(optId, 'option', opt.title, NODE_SIZES.option, opt.status);
-           addEdge(extraId, optId, 'sub');
-        });
-     });
+    lastSpineNodeId = extrasHeaderId;
+
+    roadmapJson.extras.forEach(extra => {
+      const extraId = `extra__${extra.id}`;
+      addNode(extraId, 'extra', extra.title, NODE_SIZES.extra, extra.status);
+
+      if (lastSpineNodeId) addEdge(lastSpineNodeId, extraId, 'main');
+      lastSpineNodeId = extraId;
+
+      extra.options?.forEach(opt => {
+        const optId = `option__${opt.id}`;
+        addNode(optId, 'option', opt.title, NODE_SIZES.option, opt.status);
+        addEdge(extraId, optId, 'sub');
+      });
+    });
   }
 
   return {

@@ -6,21 +6,21 @@ const NodeRenderer = ({ node, onClick }: { node: ELKNode, onClick: () => void })
   const label = labels?.[0]?.text || '';
   const styles = getNodeStyles(type);
 
+  const clickable = type === "topic" || type === "option" || type === "extra";
+
   return (
     <g
-      onClick={onClick}
-      className="cursor-pointer hover:opacity-80 transition"
+      onClick={clickable ? onClick : undefined}
+      className={clickable ? "cursor-pointer hover:opacity-80 transition" : ""}
       transform={`translate(${node.x || 0}, ${node.y || 0})`}>
-      {/* Main Node */}
       <rect
         width={width} height={height} rx={styles.rx}
         className={styles.rectClass}
       />
 
-      {/* Label */}
       <foreignObject width={width} height={height} style={{ pointerEvents: 'none' }}>
         <div className={`w-full h-full flex items-center justify-center p-2 text-center select-none ${styles.textClass}`}>
-          <span className="line-clamp-2 leading-tight">
+          <span className="leading-tight">
             {label}
           </span>
         </div>

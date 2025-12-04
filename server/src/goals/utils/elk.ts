@@ -7,8 +7,8 @@ export const layoutGraph = async (elkGraph: ElkNode, options: Record<string, str
     'elk.algorithm': 'layered',
     'elk.direction': 'DOWN',
     'elk.edgeRouting': 'ORTHOGONAL',
-    'elk.layered.spacing.nodeNodeBetweenLayers': '50',
-    'elk.spacing.nodeNode': '60',
+    'elk.layered.spacing.nodeNodeBetweenLayers': '40',
+    'elk.spacing.nodeNode': '50',
     'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
     'elk.layered.allowNonFlowPortsToSwitchSides': 'true'
   };

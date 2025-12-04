@@ -71,31 +71,31 @@ export const getNodeStyles = (type: string | undefined) => {
     case 'phase':
       return {
         rectClass: 'fill-transparent stroke-none',
-        textClass: 'text-slate-500 font-black text-xl uppercase tracking-widest',
+        textClass: 'text-slate-500 font-black text-lg uppercase tracking-widest',
         rx: 0
       };
     case 'topic':
       return {
-        rectClass: 'fill-[#FFD700] stroke-yellow-600 stroke-[3px]',
-        textClass: 'text-slate-900 font-extrabold text-sm uppercase tracking-wide',
+        rectClass: 'fill-purple-100 stroke-purple-300 stroke-2',
+        textClass: 'text-slate-900 font-extrabold text-xs uppercase tracking-wide',
         rx: 6
       };
     case 'option':
       return {
         rectClass: 'fill-[#F5F5DC] stroke-stone-400 stroke-1',
         textClass: 'text-slate-700 text-xs font-semibold',
-        rx: 4
+        rx: 6
       };
     case 'checkpoint':
       return {
-        rectClass: 'fill-slate-800 stroke-indigo-500/50 stroke-[1px] stroke-dashed',
-        textClass: 'text-indigo-300 text-xs italic',
-        rx: 20
+        rectClass: 'fill-white stroke-slate-400 stroke-0.5',
+        textClass: 'text-slate-800 text-xs font-semibold',
+        rx: 6
       };
     case 'extra':
       return {
-        rectClass: 'fill-purple-100 stroke-purple-300 stroke-2',
-        textClass: 'text-purple-900 font-bold text-sm',
+        rectClass: 'fill-blue-100 stroke-blue-300 stroke-2',
+        textClass: 'text-black font-semibold text-xs',
         rx: 6
       };
     default:
@@ -114,9 +114,6 @@ export const findEntry = (node: ELKNode | null, roadmapJson: z.infer<typeof road
   const type = node.properties?.type;
 
   switch (type) {
-    case 'phase':
-    return roadmapJson.phases.find(p => p.title === label);
-
     case 'topic':
     return roadmapJson.phases
       .flatMap(p => p.topics).find(t => t.title === label)
