@@ -8,6 +8,7 @@ declare module "elkjs" {
     height?: number;
     x?: number;
     y?: number;
+    layoutOptions?: Record<string, string>;
     properties?: Record<string, any>;
   }
 
