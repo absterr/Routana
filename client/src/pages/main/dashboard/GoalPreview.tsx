@@ -72,11 +72,11 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
                       "bg-gray-300 line-through": status === "Completed"
                     })}
                   ></div>
-                  <span className={cn("text-sm",{
-                      "text-gray-900 font-medium": status === "Active",
-                      "text-gray-600": status === "Pending",
-                      "text-gray-600 line-through": status === "Completed"
-                    }
+                  <span className={cn("text-sm", {
+                    "text-gray-900 font-medium": status === "Active",
+                    "text-gray-600": status === "Pending",
+                    "text-gray-600 line-through": status === "Completed"
+                  }
                   )}>
                     {title}
                   </span>
@@ -97,7 +97,7 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
                     >
                       {/*An icon instead of this dot describing what type of resource is it */}
                       <div className="w-2 h-2 rounded-full bg-purple-600"></div>
-                      <span className="text-sm text-gray-700 flex-1">{resource.title}</span>
+                      <span className="text-sm text-gray-700 flex-1 truncate">{resource.title}</span>
                       <span className="text-xs text-gray-400">→</span>
                     </a>
                   ),

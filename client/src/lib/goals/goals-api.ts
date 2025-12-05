@@ -2,6 +2,13 @@ import { z } from "zod";
 import CustomError from "../CustomError";
 import type { newGoalSchema } from "./goals-schema";
 
+interface StarredResource {
+  goalId: string;
+  title: string;
+  url: string;
+  starred: boolean;
+};
+
 export const getDashboardGoals = async () => {
   const res = await fetch("/api/dashboard", {
     method: "GET",
@@ -55,7 +62,7 @@ export const getRoadmapGraph = async (goalId: string) => {
     throw new Error("Invalid goal ID");
   }
 
-  const res = await fetch(`/api/goals/${goalId}`, {
+  const res = await fetch(`/api/roadmap/${goalId}`, {
     method: "GET",
     credentials: "include"
   });
@@ -64,4 +71,50 @@ export const getRoadmapGraph = async (goalId: string) => {
 
   if (!res.ok) throw new CustomError(data.error || "Failed to get roadmap layout", res.status);
   return data ?? {};
+}
+
+export const getStarredResource = async (goalId: string) => {
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    throw new Error("Invalid goal ID");
+  }
+
+  const res = await fetch(`/api/resources/${goalId}`, {
+    method: "GET",
+    credentials: "include"
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new CustomError(data.error || "Failed to get favourite resources", res.status);
+  return data.starredResources ?? [];
+}
+
+export const toggleStarredResource = async ({ goalId, ...resourceDetails }: StarredResource) => {
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    throw new Error("Invalid goal ID");
+  }
+
+  const resourceSchema = z.object({
+    title: z.string(),
+    url: z.string(),
+    starred: z.boolean()
+  });
+
+  const parsedDetails = resourceSchema.parse(resourceDetails);
+
+  const res = await fetch(`/api/resources/${goalId}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify(parsedDetails)
+  });
+
+  const data = await res.json();
+   if (!res.ok) {
+     throw new CustomError(data.error || "Unable to add resource to favourites", res.status);
+   }
+
+   return data.success;
 }

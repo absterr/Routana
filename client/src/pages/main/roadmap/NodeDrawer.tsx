@@ -18,12 +18,14 @@ import type { Dispatch, SetStateAction } from 'react';
 import StarResourceBtn from './StarResourceBtn';
 
 interface NodeDrawerProps {
+  goalId: string;
+  starredUrls: string[];
   isOpen: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>
   entry: ReturnType<typeof findEntry>;
 }
 
-const NodeDrawer = ({ isOpen, setOpen, entry }: NodeDrawerProps) => {
+const NodeDrawer = ({ goalId, starredUrls, isOpen, setOpen, entry }: NodeDrawerProps) => {
   const hasResources = entry && "resources" in entry;
 
   return (
@@ -80,7 +82,11 @@ const NodeDrawer = ({ isOpen, setOpen, entry }: NodeDrawerProps) => {
                   </h4>
                   <ul className="flex flex-col gap-y-3 text-sm">
                     {items.map(r =>
-                      <StarResourceBtn resource={r} />
+                      <StarResourceBtn
+                        key={r.id}
+                        goalId={goalId}
+                        isStarred={starredUrls.includes(r.url)} resource={r}
+                      />
                     )}
                   </ul>
                 </div>
