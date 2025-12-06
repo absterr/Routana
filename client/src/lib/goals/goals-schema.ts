@@ -81,7 +81,7 @@ export const roadmapSchema = z.object({
             notes: z.string().nullable().describe("Specific focus notes provided by the user.")
         })
     }),
-    progress: z.string().describe("The current progress the user has made with the roadmap. Always set this to 0").default("0"),
+    progress: z.coerce.number().describe("The current progress the user has made with the roadmap. Always set this to 0").default(0),
     phases: z.array(phaseSchema).describe("The main, sequential learning steps."),
     checkpoints: z.array(checkpointSchema).describe("Milestones to measure progress."),
     extras: z.array(extraSchema).describe("Supplementary topics outside the core path."),

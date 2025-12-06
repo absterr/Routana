@@ -15,7 +15,42 @@ interface RoadmapUpdate {
   newStatus: Status;
 }
 
-export const updateStatus = ({ roadmapJson, nodeId, newStatus }: RoadmapUpdate) => {
+const calculateRoadmapProgress = (roadmapJson: RoadmapJSON): number => {
+  const allNodesForProgress: (Topic | Option | Extra)[] = [];
+
+  roadmapJson.phases.forEach(phase => {
+    const traverse = (nodes: (Topic | Option)[]) => {
+      for (const node of nodes) {
+        allNodesForProgress.push(node);
+        if (node.options) {
+          traverse(node.options);
+        }
+      }
+    };
+    traverse(phase.topics);
+  });
+
+  roadmapJson.extras.forEach(extra => {
+    allNodesForProgress.push(extra)
+    if (extra.options) {
+      extra.options.forEach(option => {
+        allNodesForProgress.push(option);
+      });
+    };
+  });
+
+  const totalProgressNodes = allNodesForProgress.length;
+
+  const completedProgressNodes = allNodesForProgress.filter(
+    (node) => node.status === "Completed" || node.status === "Skipped"
+  ).length;
+
+  if (totalProgressNodes === 0) return 0;
+
+  return Math.floor((completedProgressNodes / totalProgressNodes) * 100);
+}
+
+export const updateStatus = ({ roadmapJson, nodeId, newStatus }: RoadmapUpdate): RoadmapJSON => {
   const updatedRoadmap: RoadmapJSON =
     typeof structuredClone === "function"
       ? structuredClone(roadmapJson)
@@ -40,12 +75,45 @@ export const updateStatus = ({ roadmapJson, nodeId, newStatus }: RoadmapUpdate) 
     return false;
   };
 
-  const foundInPhases = updateNode(updatedRoadmap.phases);
-  const foundInExtras = !foundInPhases && updateNode(updatedRoadmap.extras);
+  const nodeUpdated = updateNode(updatedRoadmap.phases) || updateNode(updatedRoadmap.extras);
 
-  if (foundInPhases || foundInExtras) {
-    return updatedRoadmap;
+  if (!nodeUpdated) {
+    return roadmapJson;
   }
 
-  return roadmapJson;
+  const updatePhaseStatus = (phase: Phase) => {
+      const allDescendants: (Topic | Option)[] = [];
+      const traverse = (nodes: (Topic | Option)[]) => {
+          for (const node of nodes) {
+              allDescendants.push(node);
+              if (node.options) {
+                  traverse(node.options);
+              }
+          }
+      };
+      traverse(phase.topics);
+
+      if (allDescendants.length === 0) return;
+
+      const allCompletedOrSkipped = allDescendants.every(
+          (node) => node.status === "Completed" || node.status === "Skipped"
+      );
+
+      if (allCompletedOrSkipped) {
+          const atLeastOneCompleted = allDescendants.some(
+              (node) => node.status === "Completed"
+          );
+
+          phase.status = atLeastOneCompleted ? "Completed" : "Skipped";
+      } else {
+          if (phase.status === "Completed" || phase.status === "Skipped") {
+              phase.status = "Active";
+          }
+      }
+  };
+
+  updatedRoadmap.phases.forEach(updatePhaseStatus);
+  updatedRoadmap.progress = calculateRoadmapProgress(updatedRoadmap);
+
+  return updatedRoadmap;
 }

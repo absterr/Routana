@@ -61,9 +61,10 @@ const RoadmapPage = () => {
     </div>;
   }
 
-  const roadmapJson = roadmapData.roadmapJson;
+  const { roadmapJson, ...rest } = roadmapData;
   const roadmapTitle = roadmapJson.meta.title;
   const roadmapDescription = roadmapJson.meta.userContext.notes;
+  const currentProgress = roadmapJson.progress;
   const entry = findEntry(selectedNode, roadmapJson);
   const starredUrls = Array.from(starredResources?.map((r) => r.url) || []);
 
@@ -84,19 +85,19 @@ const RoadmapPage = () => {
         <div>
           <div className="flex items-center justify-between pb-2">
             <span className="text-xs font-semibold text-gray-600">Progress</span>
-            <span className="text-xs font-semibold text-purple-600">{ }%</span>
+            <span className="text-xs font-semibold text-purple-600">{currentProgress}%</span>
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-linear-to-r from-purple-600 to-purple-500 rounded-full"
-              style={{ width: `${8}%` }}
+              style={{ width: `${currentProgress}%` }}
             ></div>
           </div>
         </div>
       </div>
     </div>
 
-    <SVG roadmapData={roadmapData}
+    <SVG roadmapData={rest}
       onNodeClick={(n) => {
         setSelectedNode(n);
         setOpen(true);
