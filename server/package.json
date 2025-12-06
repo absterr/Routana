@@ -5,9 +5,14 @@
   "main": "./dist",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
     "dev": "node --watch ./dist",
     "start": "node ./dist",
+
+    "push": "cd ./dist && npx drizzle-kit push",
+    "generate": "cd ./dist && npx drizzle-kit generate",
+    "migrate": "cd ./dist && npx drizzle-kit migrate",
+
+    "build": "tsc",
     "postinstall": "npm run build"
   },
   "keywords": [],

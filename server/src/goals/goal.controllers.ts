@@ -12,6 +12,7 @@ import { roadmapSchema } from "./roadmap.schema.js";
 import { layoutGraph } from "./utils/elk.js";
 import { jsonToElk } from "./utils/jsonToElk.js";
 import { ROADMAP_SYSTEM_PROMPT, ROADMAP_USER_PROMPT } from "./utils/prompt.js";
+import updateStatus from "./utils/updateStatus.js";
 
 const goalRoutes = Router();
 const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
@@ -302,6 +303,48 @@ goalRoutes.post("/resources/:id", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid user request" });
     }
     return res.status(500).json({ error: "Failed to persist starred resource" });
+  }
+});
+
+goalRoutes.patch("/roadmap/:id", async (req: Request, res: Response) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) {
+    return res.status(401).json({ error: "Invalid session" });
+  }
+
+  const currentGoalId = req.params.id
+  if (!/^[0-9a-fA-F-]{36}$/.test(currentGoalId)) {
+    return res.status(400).json({ error: "Invalid goal ID" });
+  }
+
+  const updateSchema = z.object({
+    nodeId: z.string(),
+    newStatus: z.enum(["Pending", "Active", "Completed", "Skipped"])
+  });
+
+  try {
+    const { nodeId, newStatus } = updateSchema.parse(req.body);
+
+    const [{ roadmapJson }] = await db
+      .select({ roadmapJson: roadmap.roadmapJson })
+      .from(roadmap)
+      .where(eq(roadmap.goalId, currentGoalId))
+      .limit(1);
+
+    const newRoadmapJson = updateStatus({ roadmapJson, nodeId, newStatus });
+
+    await db.update(roadmap)
+      .set({ roadmapJson: newRoadmapJson })
+      .where(eq(roadmap.goalId, currentGoalId));
+
+    return res.status(200).json({ success: true });
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid user request" });
+    }
+    return res.status(500).json({ error: "Failed to update node status" });
   }
 });
 

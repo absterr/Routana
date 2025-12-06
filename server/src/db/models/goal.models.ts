@@ -3,7 +3,8 @@ import z from "zod";
 import { roadmapSchema } from "../../goals/roadmap.schema.js";
 import { user } from "./auth.models.js";
 
-const statusEnum = pgEnum("status", ["Active", "Pending", "Completed"]);
+const phaseStatusEnum = pgEnum("phase_status", ["Active", "Pending", "Completed", "Skipped"]);
+const goalStatusEnum = pgEnum("goal_status", ["Active", "Pending", "Completed"]);
 
 export const goal = pgTable("goal", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -11,7 +12,7 @@ export const goal = pgTable("goal", {
   title: text("title").notNull(),
   description: text("description"),
   timeframe: text("timeframe").notNull(),
-  status: statusEnum("status").notNull().default("Active"),
+  status: goalStatusEnum("status").notNull().default("Active"),
   progress: integer("progress").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -30,7 +31,7 @@ export const phase = pgTable("phase", {
   id: uuid("id").primaryKey().defaultRandom(),
   goalId: uuid("goal_id").notNull().references(() => goal.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
-  status: statusEnum("status").notNull().default("Pending"),
+  status: phaseStatusEnum("status").notNull().default("Pending"),
   orderIndex: integer("order_index").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
