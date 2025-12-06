@@ -42,7 +42,6 @@ const StarResourceBtn = ({ goalId, resource, isStarred }: {
       url: resource.url,
       starred
     }),
-    // OPTIMISTIC UPDATE HANDLED VIA LOCAL STATE & onError ROLLBACK
     onMutate: () => {
       const previousState = starred;
       setStarred(!starred);

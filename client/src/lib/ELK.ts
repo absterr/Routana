@@ -24,7 +24,7 @@ export type ELKNode = {
   y?: number;
   properties?: {
     type: 'phase' | 'topic' | 'option' | 'checkpoint' | 'extra' | 'related';
-    status?: 'pending' | 'progress' | 'completed' | 'skipped';
+    status?: 'Pending' | 'Active' | 'Completed' | 'Skipped';
   };
 };
 

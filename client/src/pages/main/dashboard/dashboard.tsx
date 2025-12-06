@@ -8,21 +8,21 @@ import { Link } from "react-router-dom"
 import GoalPreview from "./GoalPreview"
 
 interface DashboardGoal {
-    phases: {
-        title: string;
-        status: "Active" | "Pending" | "Completed";
-        orderIndex: number;
-    }[];
-    resources: {
-        title: string;
-        url: string;
-    }[];
-    id: string;
+  phases: {
     title: string;
-    description: string | null;
-    timeframe: string;
-    status: "Active" | "Pending" | "Completed";
-    progress: number;
+    status: "Active" | "Pending" | "Completed" | "Skipped";
+    orderIndex: number;
+  }[];
+  resources: {
+    title: string;
+    url: string;
+  }[];
+  id: string;
+  title: string;
+  description: string | null;
+  timeframe: string;
+  status: "Active" | "Pending" | "Completed";
+  progress: number;
 }
 
 const DashboardPage = () => {

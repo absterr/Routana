@@ -2,12 +2,18 @@ import { z } from "zod";
 import CustomError from "../CustomError";
 import type { newGoalSchema } from "./goals-schema";
 
-interface StarredResource {
+interface ResourceDetails {
   goalId: string;
   title: string;
   url: string;
   starred: boolean;
 };
+
+interface NodeDetails {
+  goalId: string;
+  nodeId: string;
+  newStatus: "Pending" | "Active" | "Completed" | "Skipped";
+}
 
 export const getDashboardGoals = async () => {
   const res = await fetch("/api/dashboard", {
@@ -89,18 +95,10 @@ export const getStarredResource = async (goalId: string) => {
   return data.starredResources ?? [];
 }
 
-export const toggleStarredResource = async ({ goalId, ...resourceDetails }: StarredResource) => {
+export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
     throw new Error("Invalid goal ID");
   }
-
-  const resourceSchema = z.object({
-    title: z.string(),
-    url: z.string(),
-    starred: z.boolean()
-  });
-
-  const parsedDetails = resourceSchema.parse(resourceDetails);
 
   const res = await fetch(`/api/resources/${goalId}`, {
     method: "POST",
@@ -108,12 +106,34 @@ export const toggleStarredResource = async ({ goalId, ...resourceDetails }: Star
     headers: {
       "Content-type": "application/json"
     },
-    body: JSON.stringify(parsedDetails)
+    body: JSON.stringify(rest)
   });
 
   const data = await res.json();
    if (!res.ok) {
      throw new CustomError(data.error || "Unable to add resource to favourites", res.status);
+   }
+
+   return data.success;
+}
+
+export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    throw new Error("Invalid goal ID");
+  }
+
+  const res = await fetch(`/api/roadmap/${goalId}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify(rest)
+  });
+
+  const data = await res.json();
+   if (!res.ok) {
+     throw new CustomError(data.error || "Failed to change node status", res.status);
    }
 
    return data.success;

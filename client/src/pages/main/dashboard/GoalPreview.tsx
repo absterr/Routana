@@ -4,23 +4,22 @@ import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-
 interface DashboardGoal {
-    phases: {
-        title: string;
-        status: "Active" | "Pending" | "Completed";
-        orderIndex: number;
-    }[];
-    resources: {
-        title: string;
-        url: string;
-    }[];
-    id: string;
+  phases: {
     title: string;
-    description: string | null;
-    timeframe: string;
-    status: "Active" | "Pending" | "Completed";
-    progress: number;
+    status: "Active" | "Pending" | "Completed" | "Skipped";
+    orderIndex: number;
+  }[];
+  resources: {
+    title: string;
+    url: string;
+  }[];
+  id: string;
+  title: string;
+  description: string | null;
+  timeframe: string;
+  status: "Active" | "Pending" | "Completed";
+  progress: number;
 }
 
 const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
