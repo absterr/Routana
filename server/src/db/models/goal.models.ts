@@ -15,6 +15,9 @@ import { user } from "./auth.models.js";
 const phaseStatusEnum = pgEnum("phase_status", ["Active", "Pending", "Completed", "Skipped"]);
 const goalStatusEnum = pgEnum("goal_status", ["Active", "Pending", "Completed"]);
 
+const resourceType = pgEnum("resource_type", ["Video", "Article", "Course", "Documentation", "Interactive"]);
+const resourceCategory = pgEnum("resource_category", ["Free", "Paid"]);
+
 export const goal = pgTable("goal", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
@@ -50,8 +53,10 @@ export const phase = pgTable("phase", {
 export const starredResource = pgTable("starred_resource", {
   id: uuid("id").primaryKey().defaultRandom(),
   goalId: uuid("goal_id").notNull().references(() => goal.id, { onDelete: "cascade" }),
+  type: resourceType("type").notNull(),
   title: text("title").notNull(),
   url: text("url").notNull(),
+  category: resourceCategory("category").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull().defaultNow().$onUpdate(() => new Date())

@@ -4,8 +4,10 @@ import type { newGoalSchema } from "./goals-schema";
 
 interface ResourceDetails {
   goalId: string;
+  type: "Video" | "Article" | "Course" | "Documentation" | "Interactive"
   title: string;
   url: string;
+  category: "Free" | "Paid";
   starred: boolean;
 };
 

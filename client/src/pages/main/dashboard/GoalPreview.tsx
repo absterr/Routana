@@ -3,6 +3,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Book,
+  FileText,
+  GraduationCap,
+  Play,
+  Target
+} from 'lucide-react';
 
 interface DashboardGoal {
   phases: {
@@ -11,6 +18,7 @@ interface DashboardGoal {
     orderIndex: number;
   }[];
   resources: {
+    type: "Video" | "Article" | "Course" | "Documentation" | "Interactive";
     title: string;
     url: string;
   }[];
@@ -21,6 +29,14 @@ interface DashboardGoal {
   status: "Active" | "Pending" | "Completed";
   progress: number;
 }
+
+const resourceTypeIcons = {
+  Video: Play,
+  Article: FileText,
+  Course: GraduationCap,
+  Documentation: Book,
+  Interactive: Target
+};
 
 const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
   const { id, title, description, phases, progress, resources, timeframe } = goal;
@@ -90,18 +106,20 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
               <h4 className="text-sm font-semibold text-gray-900 pb-3">Starred resources</h4>
               <div className="flex flex-col gap-y-2">
                 {resources.map(
-                  (resource, idx) => (
-                    <a
-                      key={idx}
-                      href={resource.url}
-                      className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer"
-                    >
-                      {/*An icon instead of this dot describing what type of resource is it */}
-                      <div className="w-2 h-2 rounded-full bg-purple-600"></div>
-                      <span className="text-sm text-gray-700 flex-1 truncate">{resource.title}</span>
-                      <span className="text-xs text-gray-400">→</span>
-                    </a>
-                  ),
+                  (resource, idx) => {
+                    const Icon = resourceTypeIcons[resource.type] ?? FileText;
+                    return (
+                      <a
+                        key={idx}
+                        href={resource.url}
+                        className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer"
+                      >
+                        <Icon className="w-4 h-4 text-purple-600" />
+                        <span className="text-sm text-gray-700 flex-1 truncate">{resource.title}</span>
+                        <span className="text-xs text-gray-400">→</span>
+                      </a>
+                    );
+                  },
                 )}
               </div>
             </div>

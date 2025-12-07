@@ -13,18 +13,18 @@ import GoalsPage from "./pages/main/goals";
 export default function App() {
   return (
     <>
-        <AuthWrapper>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/new-goal" element={<NewGoalPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/goals" element={<GoalsPage />} />
-            <Route path="/goals/:id" element={<Roadmap />} />
-          </Routes>
-        </AuthWrapper>
+      <AuthWrapper>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/new-goal" element={<NewGoalPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/goals/:id" element={<Roadmap />} />
+        </Routes>
+      </AuthWrapper>
       <Toaster
         richColors
         position="bottom-right"

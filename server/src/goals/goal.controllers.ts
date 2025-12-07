@@ -47,7 +47,8 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
       .select({
         goalId: starredResource.goalId,
         resourceTitle: starredResource.title,
-        resourceUrl: starredResource.url
+        resourceUrl: starredResource.url,
+        resourceType: starredResource.type
       })
       .from(starredResource)
       .innerJoin(goal, eq(starredResource.goalId, goal.id))
@@ -271,13 +272,15 @@ goalRoutes.post("/resources/:id", async (req: Request, res: Response) => {
   }
 
   const resourceSchema = z.object({
+    type: z.enum(["Video", "Article", "Course", "Documentation", "Interactive"]),
     title: z.string(),
     url: z.string(),
+    category: z.enum(["Free", "Paid"]),
     starred: z.boolean()
   });
 
   try {
-    const { title, url, starred } = resourceSchema.parse(req.body);
+    const { type, title, url, category, starred } = resourceSchema.parse(req.body);
 
     const [existing] = await db.select()
       .from(starredResource)
@@ -292,8 +295,10 @@ goalRoutes.post("/resources/:id", async (req: Request, res: Response) => {
       if (starred) {
         await db.insert(starredResource).values({
           goalId: currentGoalId,
+          type,
           title,
-          url
+          url,
+          category
         });
       }
     }

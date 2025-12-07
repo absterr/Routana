@@ -38,8 +38,10 @@ const StarResourceBtn = ({ goalId, resource, isStarred }: {
   const { mutate } = useMutation({
     mutationFn: () => toggleStarredResource({
       goalId,
+      type: resource.type,
       title: resource.title,
       url: resource.url,
+      category: resource.category,
       starred
     }),
     onMutate: () => {

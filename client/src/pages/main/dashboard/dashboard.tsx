@@ -14,6 +14,7 @@ interface DashboardGoal {
     orderIndex: number;
   }[];
   resources: {
+    type: "Video" | "Article" | "Course" | "Documentation" | "Interactive";
     title: string;
     url: string;
   }[];
