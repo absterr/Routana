@@ -1,4 +1,13 @@
-import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid
+} from "drizzle-orm/pg-core";
 import z from "zod";
 import { roadmapSchema } from "../../goals/roadmap.schema.js";
 import { user } from "./auth.models.js";
@@ -28,13 +37,15 @@ export const roadmap = pgTable("roadmap", {
 });
 
 export const phase = pgTable("phase", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").notNull(),
   goalId: uuid("goal_id").notNull().references(() => goal.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   status: phaseStatusEnum("status").notNull().default("Pending"),
   orderIndex: integer("order_index").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  primaryKey({ columns: [table.id, table.goalId] })
+]);
 
 export const starredResource = pgTable("starred_resource", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -44,4 +55,4 @@ export const starredResource = pgTable("starred_resource", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull().defaultNow().$onUpdate(() => new Date())
-})
+});

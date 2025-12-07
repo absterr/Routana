@@ -24,6 +24,7 @@ interface DashboardGoal {
 
 const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
   const { id, title, description, phases, progress, resources, timeframe } = goal;
+  const sortedPhases = phases.sort((a, b) => a.orderIndex - b.orderIndex);
 
   return (
     <Collapsible key={id} className="p-5">
@@ -60,21 +61,22 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <h4 className="text-sm font-semibold text-gray-900 pb-3">Phases</h4>
-            {/* Strikethrough if completed, highlight if in progress, greyed out if undone*/}
             <div className="flex flex-col gap-y-2">
-              {phases.map(({ title, status, orderIndex }) => (
+              {sortedPhases.map(({ title, status, orderIndex }) => (
                 <div key={orderIndex} className="flex items-center gap-3">
                   <div
                     className={cn("w-2 h-2 rounded-full", {
                       "bg-purple-600": status === "Active",
                       "bg-gray-300": status === "Pending",
-                      "bg-gray-300 line-through": status === "Completed"
+                      "bg-gray-800": status === "Completed",
+                      "text-gray-600": status === "Skipped"
                     })}
                   ></div>
                   <span className={cn("text-sm", {
                     "text-gray-900 font-medium": status === "Active",
                     "text-gray-600": status === "Pending",
-                    "text-gray-600 line-through": status === "Completed"
+                    "text-gray-800 line-through": status === "Completed",
+                    "text-gray-600 line-through": status === "Skipped"
                   }
                   )}>
                     {title}

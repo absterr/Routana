@@ -95,7 +95,7 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   try {
     const goalDetails = newGoalSchema.parse(req.body);
     const response = await genAI.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       contents: ROADMAP_USER_PROMPT(goalDetails),
       config: {
         systemInstruction: ROADMAP_SYSTEM_PROMPT,
@@ -137,6 +137,7 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
       for (let i = 0; i < roadmapPhases.length; i++) {
         const p = roadmapPhases[i];
         await tx.insert(phase).values({
+          id: p.id,
           goalId: newGoal.id,
           title: p.title,
           status: p.status,
@@ -335,9 +336,31 @@ goalRoutes.patch("/roadmap/:id", async (req: Request, res: Response) => {
 
     const newRoadmapJson = updateStatus({ roadmapJson, nodeId, newStatus });
 
-    await db.update(roadmap)
-      .set({ roadmapJson: newRoadmapJson })
-      .where(eq(roadmap.goalId, currentGoalId));
+    await db.transaction(async (tx) => {
+      const oldPhases = roadmapJson.phases;
+      const newPhases = newRoadmapJson.phases;
+
+      for (const newPhase of newPhases) {
+        const oldPhase = oldPhases.find(p => p.id === newPhase.id);
+
+        if (oldPhase && oldPhase.status !== newPhase.status) {
+          await tx.update(phase)
+            .set({ status: newPhase.status })
+            .where(and(
+              eq(phase.id, newPhase.id),
+              eq(phase.goalId, currentGoalId)
+            ));
+        }
+      }
+
+      await tx.update(roadmap)
+        .set({ roadmapJson: newRoadmapJson })
+        .where(eq(roadmap.goalId, currentGoalId));
+
+      await tx.update(goal)
+        .set({ progress: newRoadmapJson.progress })
+        .where(eq(goal.id, currentGoalId));
+    });
 
     return res.status(200).json({ success: true });
   } catch (err: any) {

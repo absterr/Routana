@@ -56,7 +56,7 @@ const updateStatus = ({ roadmapJson, nodeId, newStatus }: RoadmapUpdate): Roadma
       ? structuredClone(roadmapJson)
       : JSON.parse(JSON.stringify(roadmapJson));
 
-  const updateNode = (nodes: Node[] ): boolean => {
+  const updateNode = (nodes: Node[]): boolean => {
     for (const node of nodes) {
       if (node.id === nodeId) {
         node.status = newStatus;
@@ -82,34 +82,38 @@ const updateStatus = ({ roadmapJson, nodeId, newStatus }: RoadmapUpdate): Roadma
   }
 
   const updatePhaseStatus = (phase: Phase) => {
-      const allDescendants: (Topic | Option)[] = [];
-      const traverse = (nodes: (Topic | Option)[]) => {
-          for (const node of nodes) {
-              allDescendants.push(node);
-              if (node.options) {
-                  traverse(node.options);
-              }
-          }
-      };
-      traverse(phase.topics);
+    const allDescendants: (Topic | Option)[] = [];
+    const traverse = (nodes: (Topic | Option)[]) => {
+      for (const node of nodes) {
+        allDescendants.push(node);
+        if (node.options) {
+          traverse(node.options);
+        }
+      }
+    };
+    traverse(phase.topics);
 
-      if (allDescendants.length === 0) return;
+    if (allDescendants.length === 0) return;
 
-      const allCompletedOrSkipped = allDescendants.every(
-          (node) => node.status === "Completed" || node.status === "Skipped"
+    const allCompletedOrSkipped = allDescendants.every(
+      (node) => node.status === "Completed" || node.status === "Skipped"
+    );
+
+    if (allCompletedOrSkipped) {
+      const atLeastOneCompleted = allDescendants.some(
+        (node) => node.status === "Completed"
       );
 
-      if (allCompletedOrSkipped) {
-          const atLeastOneCompleted = allDescendants.some(
-              (node) => node.status === "Completed"
-          );
-
-          phase.status = atLeastOneCompleted ? "Completed" : "Skipped";
-      } else {
-          if (phase.status === "Completed" || phase.status === "Skipped") {
-              phase.status = "Active";
-          }
+      phase.status = atLeastOneCompleted ? "Completed" : "Skipped";
+    } else {
+      const anyActive = allDescendants.some((node) => node.status === "Active");
+      if (anyActive) {
+        phase.status = "Active";
       }
+      else {
+        phase.status = "Pending"
+      }
+    }
   };
 
   updatedRoadmap.phases.forEach(updatePhaseStatus);
