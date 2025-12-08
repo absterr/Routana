@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { fromNodeHeaders } from "better-auth/node";
 import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { ElkNode } from "elkjs";
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { z } from "zod";
 import { db } from "../db/drizzle.js";
 import { goal, phase, roadmap, starredResource } from "../db/models/goal.models.js";
@@ -18,7 +18,7 @@ const goalRoutes = Router();
 const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { userId, createdAt, updatedAt, ...rest } = getTableColumns(goal);
 
-goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
+goalRoutes.get("/dashboard", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -77,7 +77,7 @@ goalRoutes.get("/dashboard", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
+goalRoutes.post("/new-goal", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -159,7 +159,7 @@ goalRoutes.post("/new-goal", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.get("/goals", async (req: Request, res: Response) => {
+goalRoutes.get("/goals", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -180,7 +180,7 @@ goalRoutes.get("/goals", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.get("/roadmap/:id", async (req: Request, res: Response) => {
+goalRoutes.get("/roadmap/:id", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -230,7 +230,7 @@ goalRoutes.get("/roadmap/:id", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.get("/resources/:id", async (req: Request, res: Response) => {
+goalRoutes.get("/resources/:id", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -258,7 +258,7 @@ goalRoutes.get("/resources/:id", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.post("/resources/:id", async (req: Request, res: Response) => {
+goalRoutes.post("/resources/:id", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -312,7 +312,7 @@ goalRoutes.post("/resources/:id", async (req: Request, res: Response) => {
   }
 });
 
-goalRoutes.patch("/roadmap/:id", async (req: Request, res: Response) => {
+goalRoutes.patch("/roadmap/:id", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -325,13 +325,13 @@ goalRoutes.patch("/roadmap/:id", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid goal ID" });
   }
 
-  const updateSchema = z.object({
+  const updateNodeStatusSchema = z.object({
     nodeId: z.string(),
     newStatus: z.enum(["Pending", "Active", "Completed", "Skipped"])
   });
 
   try {
-    const { nodeId, newStatus } = updateSchema.parse(req.body);
+    const { nodeId, newStatus } = updateNodeStatusSchema.parse(req.body);
 
     const [{ roadmapJson }] = await db
       .select({ roadmapJson: roadmap.roadmapJson })
@@ -410,3 +410,38 @@ goalRoutes.delete("/goals", async (req, res) => {
 });
 
 export default goalRoutes;
+
+goalRoutes.patch("/goals", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) {
+    return res.status(401).json({ error: "Invalid session" });
+  }
+
+  const userId = session.user.id;
+
+  const updateGoalStatusSchema = z.object({
+    goalIds: z.array(z.string()),
+    newStatus: z.enum(["Active", "Completed", "Pending"]),
+  });
+
+  try {
+    const { goalIds, newStatus } = updateGoalStatusSchema.parse(req.body);
+
+    await db.update(goal)
+      .set({ status: newStatus })
+      .where(and(
+        eq(goal.userId, userId),
+        inArray(goal.id, goalIds)
+    ));
+
+    return res.status(200).json({ success: true });
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid user request" });
+    }
+
+    return res.status(500).json({ error: "Failed to update goals' status" });
+  }
+});
