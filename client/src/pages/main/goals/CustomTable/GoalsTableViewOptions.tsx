@@ -21,7 +21,7 @@ export default function GoalsTableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="ml-auto h-8"
         >
           <Settings2 />
           View

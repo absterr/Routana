@@ -3,6 +3,9 @@ import { getAllGoals } from "@/lib/goals/goals-api";
 import { useQuery } from "@tanstack/react-query";
 import columns from "./Columns";
 import GoalsTable from "./CustomTable/GoalsTable";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Goal {
   id: string;
@@ -34,21 +37,28 @@ const GoalsPage = () => {
   if (!userGoals) return null;
 
   return (
-    <section className="flex justify-center min-h-screen">
-      <div className="">
-        <div className="flex flex-1 flex-col gap-8 p-8">
-          <div className="flex items-center justify-between gap-2">
-            <header className="flex flex-col gap-1">
-              <h1 className="text-3xl font-semibold tracking-tight">
-                Goals
-              </h1>
-              <p className="text-muted-foreground">
-                Here&apos;s a list of your goals.
-              </p>
-            </header>
+    <section className="min-h-screen max-w-5xl mx-auto">
+      <div className="flex flex-col gap-8 py-12 px-4 sm:px-6 lg:px-8">
+        <header className="flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Goals
+            </h1>
+            <p className="text-muted-foreground">
+              Here&apos;s a list of your goals.
+            </p>
           </div>
-            <GoalsTable data={userGoals} columns={columns} />
-        </div>
+          <div className="md:hidden">
+            <Link to={"/new-goal"}>
+              <Button
+                size="icon-sm"
+                className="bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors">
+                <Plus />
+              </Button>
+            </Link>
+          </div>
+        </header>
+        <GoalsTable data={userGoals} columns={columns} />
       </div>
     </section>
   );

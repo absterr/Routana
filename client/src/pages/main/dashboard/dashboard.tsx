@@ -65,7 +65,7 @@ const DashboardPage = () => {
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6 tracking-tight">Dashboard</h1>
 
       <div className="pb-12">
         <div className="bg-white rounded-xl border border-gray-200">
@@ -97,7 +97,7 @@ const DashboardPage = () => {
       <div>
         <div className="w-full flex justify-between items-center pb-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Goals</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
           </div>
           {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
