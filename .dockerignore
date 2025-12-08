@@ -1,0 +1,31 @@
+# Node artifacts
+**/node_modules
+
+# Local env files
+**/.env*
+**/*.local
+
+# Build output (Keep dist from docker stages)
+client/dist
+server/dist
+
+# Logs
+**/*.log*
+**/logs
+
+# Git
+**/.git
+**/.gitignore
+
+# OS / IDE artifacts
+.DS_Store
+.vscode
+
+# Docker
+**/Dockerfile*
+**/.docker-compose
+**/compose.yaml
+
+# Others
+**/LICENSE
+**/README.md
