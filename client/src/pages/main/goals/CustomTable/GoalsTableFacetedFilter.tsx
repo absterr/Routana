@@ -40,7 +40,7 @@ export default function GoalsTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button variant="outline" size="sm" className="h-8 border-dashed hover:cursor-pointer">
           <PlusCircle />
           {title}
           {selectedValues?.size > 0 && (

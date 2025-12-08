@@ -23,13 +23,13 @@ export const getDashboardGoals = async () => {
     credentials: "include"
   });
 
- const data = await res.json();
+  const data = await res.json();
   if (!res.ok) {
     throw new CustomError(data.error || "Unable to load dashboard", res.status);
   }
 
   return data.goals ?? [];
-}
+};
 
 export const getAllGoals = async () => {
   const res = await fetch("/api/goals", {
@@ -63,7 +63,7 @@ export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) 
   return {
     goalId: data.goalId ?? ""
   }
-}
+};
 
 export const getRoadmapGraph = async (goalId: string) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
@@ -79,7 +79,7 @@ export const getRoadmapGraph = async (goalId: string) => {
 
   if (!res.ok) throw new CustomError(data.error || "Unable to get roadmap layout", res.status);
   return data ?? {};
-}
+};
 
 export const getStarredResource = async (goalId: string) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
@@ -95,7 +95,7 @@ export const getStarredResource = async (goalId: string) => {
 
   if (!res.ok) throw new CustomError(data.error || "Failed to get favourite resources", res.status);
   return data.starredResources ?? [];
-}
+};
 
 export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
@@ -112,12 +112,12 @@ export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails
   });
 
   const data = await res.json();
-   if (!res.ok) {
-     throw new CustomError(data.error || "Unable to add resource to favourites", res.status);
-   }
+  if (!res.ok) {
+    throw new CustomError(data.error || "Unable to add resource to favourites", res.status);
+  }
 
-   return data.success;
-}
+  return data.success;
+};
 
 export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
@@ -134,12 +134,12 @@ export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
   });
 
   const data = await res.json();
-   if (!res.ok) {
-     throw new CustomError(data.error || "Unable to change node status", res.status);
-   }
+  if (!res.ok) {
+    throw new CustomError(data.error || "Unable to change node status", res.status);
+  }
 
-   return data.success;
-}
+  return data.success;
+};
 
 export const deleteGoals = async (goalIds: string[]) => {
   const res = await fetch(`/api/goals`, {
@@ -152,9 +152,30 @@ export const deleteGoals = async (goalIds: string[]) => {
   });
 
   const data = await res.json();
-   if (!res.ok) {
-     throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
-   }
+  if (!res.ok) {
+    throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
+  }
 
-   return data.success;
-}
+  return data.success;
+};
+
+export const updateGoalStatus = async (goalsDetails: {
+  goalIds: string[],
+  newStatus: "Active" | "Completed" | "Pending"
+}) => {
+  const res = await fetch(`/api/goals`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify(goalsDetails)
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new CustomError(data.error || "Unable to update goals' status", res.status);
+  }
+
+  return data.success;
+};

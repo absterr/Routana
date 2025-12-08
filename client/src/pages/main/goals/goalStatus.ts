@@ -1,10 +1,18 @@
 import {
   CheckCircle,
   Circle,
-  Timer
-} from "lucide-react"
+  Timer,
+  type LucideProps
+} from "lucide-react";
+import type { ForwardRefExoticComponent, RefAttributes } from "react";
 
-export const statuses = [
+type Status = {
+  value: "Active" | "Completed" | "Pending";
+  label: "Active" | "Completed" | "Pending";
+  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>
+}
+
+export const statuses: Status[] = [
   {
     value: "Active",
     label: "Active",
@@ -20,4 +28,4 @@ export const statuses = [
     label: "Completed",
     icon: CheckCircle,
   },
-]
+];

@@ -95,7 +95,7 @@ const columns: ColumnDef<Goal>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <GoalsTableRowActions id={row.original.id} />,
+    cell: ({ row }) => <GoalsTableRowActions id={row.original.id} currentStatus={row.original.status} />,
   },
 ]
 

@@ -9,11 +9,12 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { deleteGoals } from "@/lib/goals/goals-api";
+import { deleteGoals, updateGoalStatus } from "@/lib/goals/goals-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
-import { Trash2, X } from "lucide-react";
+import { CheckCircle2, Trash2, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { statuses } from "../goalStatus";
@@ -37,6 +38,9 @@ export default function GoalsTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   const isSelected = selectedRows.length > 0;
+  const selectedCurrentStatuses = selectedRows.map((r) => (r.original as Goal).status);
+  const hasAllstatuses = statuses.every((status) =>
+    selectedCurrentStatuses.includes(status.value));
 
   const queryClient = useQueryClient();
 
@@ -49,6 +53,22 @@ export default function GoalsTableToolbar<TData>({
     },
     onError: () => {
       toast.error("Failed to delete selected goals");
+    }
+  });
+
+  const { mutate: updateSelected, isPending: updatePending } = useMutation({
+    mutationFn: updateGoalStatus,
+    onMutate: () => {
+      toast.loading("Updating status...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      toast.dismiss();
+      toast.success("Status updated.");
+    },
+    onError: () => {
+      toast.dismiss();
+      toast.error("Unable to update status.");
     }
   });
 
@@ -70,36 +90,65 @@ export default function GoalsTableToolbar<TData>({
         )}
 
         {isSelected && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="destructive" size="sm" className="h-8 px-2 lg:px-3">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Confirm delete</DialogTitle>
-                <DialogDescription>
-                  This will delete selected goals and all associated data
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button
-                  variant="destructive"
-                  disabled={deletePending}
-                  onClick={() => {
-                    const ids = selectedRows.map((r) => (r.original as Goal).id);
-                    deleteSelected(ids);
-                  }}
-                >
-                  {deletePending ? "Deleting..." : `Delete ${selectedRows.length}`}
+          <div className="flex gap-x-3 px-2 items-baseline">
+            {!hasAllstatuses && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild disabled={updatePending}>
+                  <Button variant="outline" size="sm" className="shadow-none hover:cursor-pointer">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Set Status
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {statuses
+                    .filter((status) => !selectedCurrentStatuses.includes(status.value))
+                    .map((status) => (
+                    <DropdownMenuItem
+                      key={status.value}
+                      onClick={() => {
+                        const ids = selectedRows.map((r) => (r.original as Goal).id);
+                        updateSelected({ goalIds: ids, newStatus: status.value });
+                      }}
+                    >
+                      {<status.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
+                      {status.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="hover:cursor-pointer">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm delete</DialogTitle>
+                  <DialogDescription>
+                    This will delete selected goals and all associated data
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button
+                    variant="destructive"
+                    disabled={deletePending}
+                    onClick={() => {
+                      const ids = selectedRows.map((r) => (r.original as Goal).id);
+                      deleteSelected(ids);
+                    }}
+                  >
+                    {deletePending ? "Deleting..." : `Delete ${selectedRows.length}`}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         )}
 
         {isFiltered && (
