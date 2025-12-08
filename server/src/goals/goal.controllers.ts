@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { fromNodeHeaders } from "better-auth/node";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { ElkNode } from "elkjs";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
@@ -373,6 +373,39 @@ goalRoutes.patch("/roadmap/:id", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid user request" });
     }
     return res.status(500).json({ error: "Failed to update node status" });
+  }
+});
+
+goalRoutes.delete("/goals", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) {
+    return res.status(401).json({ error: "Invalid session" });
+  }
+
+  const userId = session.user.id;
+
+  const deleteGoalSchema = z.object({
+    goalIds: z.array(z.string())
+  });
+
+  try {
+    const { goalIds } = deleteGoalSchema.parse(req.body);
+
+    await db.delete(goal)
+      .where(and(
+        eq(goal.userId, userId),
+        inArray(goal.id, goalIds)
+      ));
+
+    return res.status(200).json({ success: true });
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid user request" });
+    }
+
+    return res.status(500).json({ error: "Failed to delete goal(s)" });
   }
 });
 
