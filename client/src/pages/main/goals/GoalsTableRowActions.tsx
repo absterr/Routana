@@ -1,16 +1,39 @@
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { deleteGoals } from "@/lib/goals/goals-api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function GoalsTableRowActions({ id }: { id: string }) {
+  const queryClient = useQueryClient();
+  const { mutate: deleteGoal, isPending: deletePending } = useMutation({
+    mutationFn: deleteGoals,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      toast.success("Successfully deleted selected goals");
+    },
+    onError: () => {
+      toast.error("Failed to delete selected goals");
+    }
+  });
 
   return (
     <DropdownMenu>
@@ -32,10 +55,33 @@ export default function GoalsTableRowActions({ id }: { id: string }) {
           </Link>
         <DropdownMenuItem>Change status</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
-          Delete
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
+        <Dialog>
+          <DialogTrigger className="text-sm text-red-600 text-left py-1.5 px-2 w-full rounded-sm hover:cursor-pointer hover:bg-neutral-100">
+            Delete
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm delete</DialogTitle>
+              <DialogDescription>
+                This will delete selected goals and all associated data
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button
+                variant="destructive"
+                disabled={deletePending}
+                onClick={() => {
+                  deleteGoal([id]);
+                }}
+              >
+                {deletePending ? "Deleting..." : "Delete goal"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>
   );

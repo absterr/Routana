@@ -1,8 +1,21 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { deleteGoals } from "@/lib/goals/goals-api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { statuses } from "../goalStatus";
 import GoalsTableFacetedFilter from "./GoalsTableFacetedFilter";
 import GoalsTableViewOptions from "./GoalsTableViewOptions";
@@ -11,10 +24,33 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>
 }
 
+interface Goal {
+  id: string;
+  title: string;
+  description: string | undefined;
+  status: "Active" | "Pending" | "Completed";
+}
+
 export default function GoalsTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const isSelected = selectedRows.length > 0;
+
+  const queryClient = useQueryClient();
+
+  const { mutate: deleteSelected, isPending: deletePending } = useMutation({
+    mutationFn: deleteGoals,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      table.resetRowSelection();
+      toast.success("Successfully deleted selected goals");
+    },
+    onError: () => {
+      toast.error("Failed to delete selected goals");
+    }
+  });
 
   return (
     <div className="flex items-center justify-between">
@@ -32,6 +68,40 @@ export default function GoalsTableToolbar<TData>({
             options={statuses}
           />
         )}
+
+        {isSelected && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="destructive" size="sm" className="h-8 px-2 lg:px-3">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm delete</DialogTitle>
+                <DialogDescription>
+                  This will delete selected goals and all associated data
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button
+                  variant="destructive"
+                  disabled={deletePending}
+                  onClick={() => {
+                    const ids = selectedRows.map((r) => (r.original as Goal).id);
+                    deleteSelected(ids);
+                  }}
+                >
+                  {deletePending ? "Deleting..." : `Delete ${selectedRows.length}`}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
         {isFiltered && (
           <Button
             variant="ghost"

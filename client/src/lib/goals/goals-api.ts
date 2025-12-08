@@ -25,7 +25,7 @@ export const getDashboardGoals = async () => {
 
  const data = await res.json();
   if (!res.ok) {
-    throw new CustomError(data.error || "Failed to load dashboard", res.status);
+    throw new CustomError(data.error || "Unable to load dashboard", res.status);
   }
 
   return data.goals ?? [];
@@ -39,7 +39,7 @@ export const getAllGoals = async () => {
 
  const data = await res.json();
   if (!res.ok) {
-    throw new CustomError(data.error || "Failed to get goals", res.status);
+    throw new CustomError(data.error || "Unable to get goals", res.status);
   }
 
   return data.goals ?? [];
@@ -77,7 +77,7 @@ export const getRoadmapGraph = async (goalId: string) => {
 
   const data = await res.json();
 
-  if (!res.ok) throw new CustomError(data.error || "Failed to get roadmap layout", res.status);
+  if (!res.ok) throw new CustomError(data.error || "Unable to get roadmap layout", res.status);
   return data ?? {};
 }
 
@@ -135,7 +135,25 @@ export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
 
   const data = await res.json();
    if (!res.ok) {
-     throw new CustomError(data.error || "Failed to change node status", res.status);
+     throw new CustomError(data.error || "Unable to change node status", res.status);
+   }
+
+   return data.success;
+}
+
+export const deleteGoals = async (goalIds: string[]) => {
+  const res = await fetch(`/api/goals`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify({ goalIds })
+  });
+
+  const data = await res.json();
+   if (!res.ok) {
+     throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
    }
 
    return data.success;
