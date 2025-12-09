@@ -8,7 +8,6 @@
     "build": "tsc",
     "dev": "node --watch ./dist",
     "start": "node ./dist",
-
     "push": "cd ./dist && npx drizzle-kit push",
     "generate": "cd ./dist && npx drizzle-kit generate",
     "migrate": "cd ./dist && npx drizzle-kit migrate"
@@ -32,6 +31,7 @@
     "elkjs": "^0.4.1",
     "express": "^5.1.0",
     "resend": "^6.5.2",
+    "stripe": "^20.0.0",
     "zod": "^4.1.12"
   }
 }

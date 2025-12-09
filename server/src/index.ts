@@ -5,6 +5,7 @@ import path from "path";
 import goalRoutes from "./goals/goal.controllers.js";
 import { auth } from "./lib/auth.js";
 import env from "./lib/env.js";
+import stripeRoutes from "./stripe/stripe.controllers.js";
 
 const rootDir = process.cwd();
 const PORT = env.PORT;
@@ -14,6 +15,7 @@ app.use("/api/auth", toNodeHandler(auth))
 
 app.use(express.json());
 app.use("/api", goalRoutes);
+app.use("/api", stripeRoutes);
 
 app.use(express.static(path.join(rootDir, "client/dist/")));
 app.use((_req, res) => {
