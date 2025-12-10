@@ -1,5 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle
+} from '@/components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,26 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import type { ELKNode, findEntry } from '@/lib/ELK';
+import type { findEntry } from '@/lib/ELK';
 import { updateNodeStatus } from '@/lib/goals/goals-api';
-import type { roadmapSchema } from '@/lib/goals/goals-schema';
+import type { RoadmapData } from '@/lib/goals/types';
 import { updateStatus } from '@/lib/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  ChevronDown,
-  X
-} from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { toast } from 'sonner';
-import type z from 'zod';
 import StarResourceBtn from './StarResourceBtn';
-
-interface RoadmapData {
-  layout: ELKNode;
-  width: number;
-  height: number;
-  roadmapJson: z.infer<typeof roadmapSchema>;
-}
 
 interface NodeDrawerProps {
   goalId: string;

@@ -1,42 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { type DashboardGoal, resourceTypeIcons } from "@/lib/goals/types";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  Book,
-  FileText,
-  GraduationCap,
-  Play,
-  Target
-} from 'lucide-react';
-
-interface DashboardGoal {
-  phases: {
-    title: string;
-    status: "Active" | "Pending" | "Completed" | "Skipped";
-    orderIndex: number;
-  }[];
-  resources: {
-    type: "Video" | "Article" | "Course" | "Documentation" | "Interactive";
-    title: string;
-    url: string;
-  }[];
-  id: string;
-  title: string;
-  description: string | null;
-  timeframe: string;
-  status: "Active" | "Pending" | "Completed";
-  progress: number;
-}
-
-const resourceTypeIcons = {
-  Video: Play,
-  Article: FileText,
-  Course: GraduationCap,
-  Documentation: Book,
-  Interactive: Target
-};
 
 const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
   const { id, title, description, phases, progress, resources, timeframe } = goal;
@@ -107,7 +74,7 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
               <div className="flex flex-col gap-y-2">
                 {resources.map(
                   (resource, idx) => {
-                    const Icon = resourceTypeIcons[resource.type] ?? FileText;
+                    const Icon = resourceTypeIcons[resource.type];
                     return (
                       <a
                         key={idx}

@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { deleteGoals, updateGoalStatus } from "@/lib/goals/goals-api";
+import type { Goal } from "@/lib/goals/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
 import { CheckCircle2, MoreHorizontal, Trash2 } from "lucide-react";
@@ -24,13 +25,6 @@ import { statuses } from "../goalStatus";
 
 interface DataTableActionProps<TData> {
   table: Table<TData>
-}
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string | undefined;
-  status: "Active" | "Pending" | "Completed";
 }
 
 export default function GoalsTableActions<TData>({

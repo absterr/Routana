@@ -1,13 +1,7 @@
 import { toggleStarredResource } from '@/lib/goals/goals-api';
+import { resourceTypeIcons } from '@/lib/goals/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  Book,
-  FileText,
-  GraduationCap,
-  Play,
-  Star,
-  Target
-} from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useState } from "react";
 
 interface Resource {
@@ -18,20 +12,12 @@ interface Resource {
   category: "Free" | "Paid";
 }
 
-const resourceTypeIcons = {
-  Video: Play,
-  Article: FileText,
-  Course: GraduationCap,
-  Documentation: Book,
-  Interactive: Target
-};
-
 const StarResourceBtn = ({ goalId, resource, isStarred }: {
   goalId: string;
   resource: Resource;
   isStarred: boolean;
 }) => {
-  const Icon = resourceTypeIcons[resource.type] ?? FileText;
+  const Icon = resourceTypeIcons[resource.type];
   const [starred, setStarred] = useState(isStarred);
   const queryClient = useQueryClient();
 

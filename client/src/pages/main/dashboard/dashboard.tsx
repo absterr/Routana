@@ -1,30 +1,12 @@
 import LoadingSpinner from "@/components/LoadingSpinner"
 import { Button } from "@/components/ui/button"
 import { getDashboardGoals } from "@/lib/goals/goals-api"
+import type { DashboardGoal } from "@/lib/goals/types"
 import { cn } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
 import { ArrowLeft, Plus, Rocket } from "lucide-react"
 import { Link } from "react-router-dom"
 import GoalPreview from "./GoalPreview"
-
-interface DashboardGoal {
-  phases: {
-    title: string;
-    status: "Active" | "Pending" | "Completed" | "Skipped";
-    orderIndex: number;
-  }[];
-  resources: {
-    type: "Video" | "Article" | "Course" | "Documentation" | "Interactive";
-    title: string;
-    url: string;
-  }[];
-  id: string;
-  title: string;
-  description: string | null;
-  timeframe: string;
-  status: "Active" | "Pending" | "Completed";
-  progress: number;
-}
 
 const DashboardPage = () => {
   const { data: dashboardGoals, isLoading, error } = useQuery<DashboardGoal[], Error>({
@@ -101,7 +83,7 @@ const DashboardPage = () => {
           </div>
           {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
-              <Button className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2">
+              <Button className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 cursor-pointer">
                 <Plus className="w-5 h-5" />
                 New Goal
               </Button>
@@ -124,7 +106,7 @@ const DashboardPage = () => {
             </div>
             <Link to={hasNoGoals ? "/new-goal" : "/goals"}>
               <Button
-                className="bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
+                className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 hover:cursor-pointer"
               >
                 {hasNoGoals
                   ? <>

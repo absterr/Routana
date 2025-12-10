@@ -1,18 +1,12 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 import { getAllGoals } from "@/lib/goals/goals-api";
+import type { Goal } from "@/lib/goals/types";
 import { useQuery } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import columns from "./Columns";
 import GoalsTable from "./CustomTable/GoalsTable";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string | undefined;
-  status: "Active" | "Pending" | "Completed";
-}
 
 const GoalsPage = () => {
   const { data: userGoals, isLoading, error } = useQuery<Goal[], Error>({

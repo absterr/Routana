@@ -1,21 +1,13 @@
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { findEntry, type ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph, getStarredResource } from '@/lib/goals/goals-api';
-import type { roadmapSchema } from '@/lib/goals/goals-schema';
+import type { RoadmapData } from '@/lib/goals/types';
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type z from "zod";
 import NodeDrawer from './NodeDrawer';
 import SVG from './SVG';
-
-interface RoadmapData {
-  layout: ELKNode;
-  width: number;
-  height: number;
-  roadmapJson: z.infer<typeof roadmapSchema>;
-}
 
 interface StarredResource {
   id: string;

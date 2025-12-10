@@ -3,7 +3,7 @@ import { DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdo
 import { Input } from "@/components/ui/input";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { type Table } from "@tanstack/react-table";
-import { Sliders, X } from "lucide-react";
+import { Plus, Sliders, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { statuses } from "../goalStatus";
 import GoalsTableActions from "./GoalsTableActions";
@@ -80,8 +80,11 @@ export default function GoalsTableToolbar<TData>({
       <Link to={"/new-goal"} className="hidden md:block">
         <Button
           size="sm"
-          className="hover:cursor-pointer bg-purple-600 hover:bg-purple-700"
-        >New Goal</Button>
+          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 hover:cursor-pointer"
+        >
+          <Plus className="w-5 h-5" />
+          New Goal
+        </Button>
       </Link>
     </div>
   );

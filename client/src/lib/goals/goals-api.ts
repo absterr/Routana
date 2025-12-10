@@ -17,6 +17,8 @@ interface NodeDetails {
   newStatus: "Pending" | "Active" | "Completed" | "Skipped";
 }
 
+
+// GET
 export const getDashboardGoals = async () => {
   const res = await fetch("/api/dashboard", {
     method: "GET",
@@ -44,26 +46,6 @@ export const getAllGoals = async () => {
 
   return data.goals ?? [];
 }
-
-export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
-  const res = await fetch("/api/new-goal", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
-    body: JSON.stringify(goalDetails)
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Failed to generate roadmap", res.status);
-  }
-
-  return {
-    goalId: data.goalId ?? ""
-  }
-};
 
 export const getRoadmapGraph = async (goalId: string) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
@@ -97,6 +79,28 @@ export const getStarredResource = async (goalId: string) => {
   return data.starredResources ?? [];
 };
 
+
+// POST
+export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
+  const res = await fetch("/api/new-goal", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify(goalDetails)
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new CustomError(data.error || "Failed to generate roadmap", res.status);
+  }
+
+  return {
+    goalId: data.goalId ?? ""
+  }
+};
+
 export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
     throw new Error("Invalid goal ID");
@@ -119,6 +123,7 @@ export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails
   return data.success;
 };
 
+// PUT | PATCH
 export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
   if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
     throw new Error("Invalid goal ID");
@@ -141,24 +146,6 @@ export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
   return data.success;
 };
 
-export const deleteGoals = async (goalIds: string[]) => {
-  const res = await fetch(`/api/goals`, {
-    method: "DELETE",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
-    body: JSON.stringify({ goalIds })
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
-  }
-
-  return data.success;
-};
-
 export const updateGoalStatus = async (goalsDetails: {
   goalIds: string[],
   newStatus: "Active" | "Completed" | "Pending"
@@ -175,6 +162,26 @@ export const updateGoalStatus = async (goalsDetails: {
   const data = await res.json();
   if (!res.ok) {
     throw new CustomError(data.error || "Unable to update goals' status", res.status);
+  }
+
+  return data.success;
+};
+
+
+// DELETE
+export const deleteGoals = async (goalIds: string[]) => {
+  const res = await fetch(`/api/goals`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify({ goalIds })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
   }
 
   return data.success;

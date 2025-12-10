@@ -1,15 +1,9 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Goal } from "@/lib/goals/types";
 import { type ColumnDef } from "@tanstack/react-table";
-import { statuses } from "./goalStatus";
 import GoalsTableColumnHeader from "./GoalsTableColumnHeader";
 import GoalsTableRowActions from "./GoalsTableRowActions";
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string | undefined;
-  status: "Active" | "Pending" | "Completed";
-}
+import { statuses } from "./goalStatus";
 
 const columns: ColumnDef<Goal>[] = [
   {
