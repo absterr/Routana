@@ -21,7 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
 import { CheckCircle2, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { statuses } from "../goalStatus";
+import { statuses } from "./goalStatus";
 
 interface DataTableActionProps<TData> {
   table: Table<TData>

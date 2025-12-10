@@ -5,7 +5,7 @@ import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { type Table } from "@tanstack/react-table";
 import { Plus, Sliders, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { statuses } from "../goalStatus";
+import { statuses } from "./goalStatus";
 import GoalsTableActions from "./GoalsTableActions";
 import GoalsTableFacetedFilter from "./GoalsTableFacetedFilter";
 import GoalsTableViewOptions from "./GoalsTableViewOptions";

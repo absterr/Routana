@@ -5,8 +5,8 @@ import type { Goal } from "@/lib/goals/types";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import columns from "./Columns";
-import GoalsTable from "./CustomTable/GoalsTable";
+import columns from "@/components/CustomTable/Columns";
+import GoalsTable from "@/components/CustomTable/GoalsTable";
 
 const GoalsPage = () => {
   const { data: userGoals, isLoading, error } = useQuery<Goal[], Error>({
