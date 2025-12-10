@@ -65,6 +65,30 @@ stripeRoutes.post("/checkout", async (req, res) => {
   }
 });
 
+// CANCEL SUBSCRIPTION
+stripeRoutes.post("/cancel", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) return res.status(401).json({ error: "Invalid session" });
+
+  const userSubscriptionId = session.user.stripeSubscriptionId;
+  if (!userSubscriptionId) {
+    return res.status(400).json({ error: "Invalid subscription id " });
+  }
+
+  try {
+    const subscription = await stripe.subscriptions.update(userSubscriptionId, {
+      cancel_at_period_end: true,
+    });
+    return res.json({
+      canceled: subscription.cancel_at_period_end,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to cancel subscription" });
+  }
+});
+
 // WEBHOOK
 stripeRoutes.post("/webhook", raw({ type: "application/json" }), async (req, res) => {
   let event: Stripe.Event;
