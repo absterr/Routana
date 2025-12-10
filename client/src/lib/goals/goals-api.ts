@@ -150,7 +150,7 @@ export const updateGoalStatus = async (goalsDetails: {
   goalIds: string[],
   newStatus: "Active" | "Completed" | "Pending"
 }) => {
-  const res = await fetch(`/api/goals`, {
+  const res = await fetch("/api/goals", {
     method: "PATCH",
     credentials: "include",
     headers: {
@@ -170,7 +170,7 @@ export const updateGoalStatus = async (goalsDetails: {
 
 // DELETE
 export const deleteGoals = async (goalIds: string[]) => {
-  const res = await fetch(`/api/goals`, {
+  const res = await fetch("/api/goals", {
     method: "DELETE",
     credentials: "include",
     headers: {

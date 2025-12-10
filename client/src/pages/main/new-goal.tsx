@@ -75,7 +75,7 @@ const NewGoalPage = () => {
   }
 
   return (
-    <section className="min-h-screen flex flex-col items-center px-4 py-12">
+    <section className="flex flex-col items-center px-4 py-12">
       <div className="w-full max-w-3xl">
         <header className="text-center pb-8 sm:pb-4">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 text-balance pb-4 tracking-tight">

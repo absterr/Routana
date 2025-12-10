@@ -1,8 +1,13 @@
 import type { User } from "better-auth";
 import { createContext, useContext } from "react";
 
+export interface AppUser extends User {
+  plan: "Hobby" | "Pro monthly" | "Pro yearly";
+  subscriptionStatus?: string | null | undefined;
+}
+
 type AuthContextValue = {
-  user: User | null;
+  user: AppUser | null;
 };
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);

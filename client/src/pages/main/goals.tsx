@@ -31,7 +31,7 @@ const GoalsPage = () => {
   if (!userGoals) return null;
 
   return (
-    <section className="min-h-screen max-w-5xl mx-auto">
+    <section className="max-w-5xl mx-auto">
       <div className="flex flex-col gap-8 py-12 px-4 sm:px-6 lg:px-8">
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-1">

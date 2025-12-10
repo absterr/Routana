@@ -46,7 +46,7 @@ const DashboardPage = () => {
   ];
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 pt-2 pb-6 tracking-tight">Dashboard</h1>
 
       <div className="pb-12">
@@ -76,11 +76,9 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <div>
+      <div className="pb-16">
         <div className="w-full flex justify-between items-center pb-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
           {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
               <Button className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 cursor-pointer">

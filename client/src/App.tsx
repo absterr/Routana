@@ -9,20 +9,24 @@ import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
 import GoalsPage from "./pages/main/goals";
+import BillingPage from "./pages/main/billing/billing";
 
 export default function App() {
   return (
     <>
       <AuthWrapper>
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/new-goal" element={<NewGoalPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/new-goal" element={<NewGoalPage />} />
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/goals/:id" element={<Roadmap />} />
+
+          <Route path="/billing" element={<BillingPage />} />
         </Routes>
       </AuthWrapper>
       <Toaster

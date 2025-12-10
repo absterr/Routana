@@ -1,9 +1,8 @@
-import type { User } from "better-auth";
 import { type ReactNode } from "react";
-import { AuthContext } from "./useAuth";
+import { type AppUser, AuthContext } from "./useAuth";
 
 const AuthProvider = ({ user, children }: {
-  user: User | null;
+  user: AppUser | null;
   children: ReactNode;
 }) => (
   <AuthContext.Provider value={{ user }}>
