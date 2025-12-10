@@ -15,6 +15,7 @@ const WEBHOOK_KEY = env.STRIPE_WEBHOOK_KEY;
 
 type UserPlan = "Hobby" | "Pro monthly" | "Pro yearly";
 
+
 // CHECKOUT
 stripeRoutes.post("/checkout", async (req, res) => {
   const session = await auth.api.getSession({
@@ -65,6 +66,7 @@ stripeRoutes.post("/checkout", async (req, res) => {
   }
 });
 
+
 // CANCEL SUBSCRIPTION
 stripeRoutes.post("/cancel", async (req, res) => {
   const session = await auth.api.getSession({
@@ -74,7 +76,7 @@ stripeRoutes.post("/cancel", async (req, res) => {
 
   const userSubscriptionId = session.user.stripeSubscriptionId;
   if (!userSubscriptionId) {
-    return res.status(400).json({ error: "Invalid subscription id " });
+    return res.status(400).json({ error: "Invalid subscription ID " });
   }
 
   try {
@@ -88,6 +90,31 @@ stripeRoutes.post("/cancel", async (req, res) => {
     return res.status(500).json({ error: "Failed to cancel subscription" });
   }
 });
+
+
+// BILLING PORTAL
+stripeRoutes.post("/portal", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) return res.status(401).json({ error: "Invalid session" });
+
+  const userCustomerId = session.user.stripeCustomerId;
+  if (!userCustomerId) {
+    return res.status(400).json({ error: "Invalid customer ID " });
+  }
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: userCustomerId,
+      return_url: `${process.env.BETTER_AUTH_URL}/billing`,
+    });
+    return res.json({ url: session.url });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to establish session" });
+  }
+});
+
 
 // WEBHOOK
 stripeRoutes.post("/webhook", raw({ type: "application/json" }), async (req, res) => {
