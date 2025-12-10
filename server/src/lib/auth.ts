@@ -50,5 +50,18 @@ export const auth = betterAuth({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET
     }
+  },
+  user: {
+    additionalFields: {
+      plan: {
+        type: ["Hobby", "Pro monthly", "Pro yearly"] as const,
+        defaultValue: "Hobby",
+        required: true,
+      },
+      stripeCustomerId: { type: "string", required: false },
+      stripeSubscriptionId: { type: "string", required: false },
+      subscriptionStatus: { type: "string", required: false },
+      subscriptionExpiresAt: { type: "date", required: false },
+    },
   }
 });

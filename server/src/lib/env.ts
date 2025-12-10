@@ -14,6 +14,7 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string(),
   STRIPE_PRODUCT_ID: z.string(),
   STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_KEY: z.string()
 });
 
 const env = envSchema.parse(process.env);
