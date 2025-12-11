@@ -29,10 +29,10 @@ userRoutes.post("/name", async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return res.status(400).json({ error: "Invalid checkout request" });
+      return res.status(400).json({ error: "Invalid user request" });
     }
 
-    return res.status(500).json({ error: `An unexptected error occured: ` })
+    return res.status(500).json({ error: "Failed to set new user name" });
   }
 });
 
