@@ -2,8 +2,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db/drizzle.js";
 import { account, session, user, verification } from "../db/models/auth.models.js";
-import { sendAuthMail } from "./email.js";
-import { EMAIL_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE } from "./emailTemplates.js";
+import { sendMail } from "./email.js";
+import { EMAIL_CHANGE_TEMPLATE, EMAIL_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE } from "./emailTemplates.js";
 import env from "./env.js";
 
 export const auth = betterAuth({
@@ -24,7 +24,7 @@ export const auth = betterAuth({
     maxPasswordLength: 32,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      await sendAuthMail({
+      await sendMail({
         to: user.email,
         subject: "Password reset",
         template: PASSWORD_RESET_TEMPLATE,
@@ -36,7 +36,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendAuthMail({
+      await sendMail({
         to: user.email,
         subject: "Email verification",
         template: EMAIL_VERIFICATION_TEMPLATE,
@@ -52,6 +52,24 @@ export const auth = betterAuth({
     }
   },
   user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        await sendMail({
+          to: user.email,
+          subject: "Email change requested",
+          template: EMAIL_CHANGE_TEMPLATE,
+          newEmail
+        });
+
+        await sendMail({
+          to: newEmail,
+          subject: "Approve email change",
+          template: EMAIL_VERIFICATION_TEMPLATE,
+          url
+        });
+      }
+    },
     additionalFields: {
       plan: {
         type: ["Hobby", "Pro monthly", "Pro yearly"] as const,

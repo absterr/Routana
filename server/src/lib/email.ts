@@ -7,16 +7,25 @@ interface Params {
   to: string;
   subject: string;
   template: string;
-  url: string;
+  url?: string;
+  newEmail?: string;
 }
 
-export const sendAuthMail = async ({ to, subject, template, url }: Params) => {
+export const sendMail = async ({ to, subject, template, url, newEmail }: Params) => {
+  let html = template;
+  if (newEmail) {
+     html = html.replace("{{newEmail}}", newEmail)
+  };
+  if (url) {
+    html = html.replace("{URL}", url)
+  };
+
   try {
     const { data, error } = await resend.emails.send({
       from: env.EMAIL_FROM,
       to: to.toLowerCase().trim(),
       subject: subject.trim(),
-      html: template.replace("{URL}", url),
+      html
     });
     if (error) return error;
     return data;
