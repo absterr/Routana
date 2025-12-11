@@ -8,19 +8,21 @@ import { auth } from "../lib/auth.js";
 
 const userRoutes = Router();
 
-userRoutes.post("/name", async (req, res) => {
+userRoutes.patch("/name", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
   if (!session) return res.status(401).json({ error: "Invalid session" });
 
   const currentUserId = session.user.id;
-  const nameSchema = z.string().
-    min(1, "Name is required")
-    .max(24, "Name must be less than 25 characters");
+  const nameSchema = z.object({
+    newName: z.string()
+      .min(1, "Name is required")
+      .max(24, "Name must be less than 25 characters")
+  });
 
   try {
-    const newName = nameSchema.parse(req.body);
+    const { newName } = nameSchema.parse(req.body);
 
     await db.update(user)
       .set({ name: newName })
