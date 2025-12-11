@@ -44,6 +44,8 @@ COPY --from=client-build /app/client/dist/ ./client/dist
 # Switch to non-root user (node)
 USER node
 
+WORKDIR /app/server
+
 ENV NODE_ENV=production
 
 ENV PORT=5000
