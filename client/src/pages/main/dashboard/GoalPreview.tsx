@@ -94,7 +94,7 @@ const GoalPreview = ({ goal }: { goal: DashboardGoal }) => {
         </div>
         <div className="pt-10">
           <Link to={`/goals/${id}`} className="text-sm">
-            <Button variant={"outline"} className="shadow-none cursor-pointer">View roadmap</Button>
+            <Button variant={"outline"} className="shadow-none cursor-pointer rounded-lg">View roadmap</Button>
           </Link>
         </div>
       </CollapsibleContent>

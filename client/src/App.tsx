@@ -9,7 +9,8 @@ import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
 import GoalsPage from "./pages/main/goals";
-import BillingPage from "./pages/main/billing/billing";
+import BillingPage from "./pages/main/billing";
+import ProfilePage from "./pages/main/profile";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/goals/:id" element={<Roadmap />} />
 
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/billing" element={<BillingPage />} />
         </Routes>
       </AuthWrapper>

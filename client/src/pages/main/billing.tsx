@@ -1,10 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/useAuth";
-import { cancel, checkout } from "@/lib/payments-api";
+import { cancel, checkout } from "@/lib/user/payments-api";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const billingDetails = [
@@ -92,7 +92,7 @@ const BillingPage = () => {
                  : <Button
                    variant={isActive ? "destructive" : "default"}
                    disabled={cancelMutation.isPending || checkoutMutation.isPending}
-                   onClick={ isActive
+                   onClick={isActive
                      ? () => cancelMutation.mutate()
                      : () => checkoutMutation.mutate(detail.interval)
                    }
@@ -105,6 +105,12 @@ const BillingPage = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="text-center pt-12">
+        <Link to={"/pricing"} className="text-gray-600 hover:underline">
+          See all plans and features
+        </Link>
       </div>
     </section>
   );

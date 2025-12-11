@@ -7,7 +7,8 @@ export const {
   signOut,
   requestPasswordReset,
   resetPassword,
-  useSession
+  useSession,
+  changeEmail
 } = createAuthClient({
   sessionOptions: {
     refetchOnWindowFocus: false,

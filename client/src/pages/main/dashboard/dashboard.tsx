@@ -81,7 +81,7 @@ const DashboardPage = () => {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
           {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
-              <Button className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 cursor-pointer">
+              <Button className="bg-purple-600 text-white font-semibold hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-2 cursor-pointer">
                 <Plus className="w-5 h-5" />
                 New Goal
               </Button>
@@ -104,7 +104,7 @@ const DashboardPage = () => {
             </div>
             <Link to={hasNoGoals ? "/new-goal" : "/goals"}>
               <Button
-                className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 hover:cursor-pointer"
+                className="bg-purple-600 text-white font-semibold hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-2 hover:cursor-pointer"
               >
                 {hasNoGoals
                   ? <>

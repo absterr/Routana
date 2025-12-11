@@ -80,10 +80,10 @@ export default function GoalsTableToolbar<TData>({
       <Link to={"/new-goal"} className="hidden md:block">
         <Button
           size="sm"
-          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors inline-flex items-center gap-2 hover:cursor-pointer"
+          className="bg-purple-600 text-white font-semibold hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-x-1.5 hover:cursor-pointer"
         >
           <Plus className="w-5 h-5" />
-          New Goal
+          New
         </Button>
       </Link>
     </div>

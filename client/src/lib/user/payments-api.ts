@@ -1,4 +1,4 @@
-import CustomError from "./CustomError";
+import CustomError from "../CustomError";
 
 export const checkout = async (interval: "month" | "year") => {
   const res = await fetch("/api/stripe/checkout", {

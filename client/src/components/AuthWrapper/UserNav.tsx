@@ -67,17 +67,16 @@ if (!user) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-          </DropdownMenuItem>
+          <Link to={"/profile"}>
+            <DropdownMenuItem>
+              Profile
+            </DropdownMenuItem>
+          </Link>
           <Link to={"/billing"}>
             <DropdownMenuItem>
               Billing
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>
-            Settings
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled={pending} onClick={handleLogOut}>
