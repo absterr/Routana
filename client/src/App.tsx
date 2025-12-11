@@ -8,9 +8,10 @@ import ForgotPasswordPage from "./pages/auth/forgot-password";
 import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
-import GoalsPage from "./pages/main/goals";
 import BillingPage from "./pages/main/billing";
+import GoalsPage from "./pages/main/goals";
 import ProfilePage from "./pages/main/profile";
+import NotFound from "./pages/not-found";
 
 export default function App() {
   return (
@@ -29,6 +30,8 @@ export default function App() {
 
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/billing" element={<BillingPage />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthWrapper>
       <Toaster

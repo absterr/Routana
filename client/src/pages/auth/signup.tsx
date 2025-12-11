@@ -133,7 +133,7 @@ const SignupPage = () => {
 
         <form className="flex flex-col gap-y-3" onSubmit={form.handleSubmit(onSubmit)}>
           {(["name", "email"] as const).map(
-            (field) => <div>
+            (field) => <div key={field}>
               <input
                 type={field === "email" ? "email" : "text"}
                 placeholder={field === "email" ? "Enter your email address" : "Enter your name"}
@@ -154,7 +154,7 @@ const SignupPage = () => {
           </div>
 
           {(["password", "confirmPassword"] as const).map(
-            (field) => <div>
+            (field) => <div key={field}>
               <input
                 type="password"
                 placeholder={field === "password" ? "Enter your password" : "Confirm password"}
