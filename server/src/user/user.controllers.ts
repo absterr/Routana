@@ -1,14 +1,14 @@
 import { fromNodeHeaders } from "better-auth/node";
-import { Router } from "express";
-import { auth } from "../lib/auth.js";
-import z from "zod";
-import { user } from "../db/models/auth.models.js";
 import { eq } from "drizzle-orm";
+import { Router } from "express";
+import z from "zod";
 import { db } from "../db/drizzle.js";
+import { user } from "../db/models/auth.models.js";
+import { auth } from "../lib/auth.js";
 
 const userRoutes = Router();
 
-userRoutes.post("/change-name", async (req, res) => {
+userRoutes.post("/name", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers)
   });
@@ -22,7 +22,9 @@ userRoutes.post("/change-name", async (req, res) => {
   try {
     const newName = nameSchema.parse(req.body);
 
-    await db.update(user).set({ name: newName }).where(eq(user.id, currentUserId));
+    await db.update(user)
+      .set({ name: newName })
+      .where(eq(user.id, currentUserId));
 
     return res.status(200).json({ success: true });
   } catch (err) {
@@ -31,6 +33,23 @@ userRoutes.post("/change-name", async (req, res) => {
     }
 
     return res.status(500).json({ error: `An unexptected error occured: ` })
+  }
+});
+
+userRoutes.delete("/delete", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers)
+  });
+  if (!session) return res.status(401).json({ error: "Invalid session" });
+
+  const currentUserId = session.user.id;
+
+  try {
+    await db.delete(user).where(eq(user.id, currentUserId));
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete user account" });
   }
 });
 
