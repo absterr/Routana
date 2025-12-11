@@ -70,6 +70,7 @@ goalRoutes.get("/dashboard", async (req, res) => {
         .map(r => ({
           title: r.resourceTitle,
           url: r.resourceUrl,
+          type: r.resourceType
         }))
     }));
 

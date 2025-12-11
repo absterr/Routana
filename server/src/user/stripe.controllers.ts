@@ -8,12 +8,12 @@ import { user } from "../db/models/auth.models.js";
 import { auth } from "../lib/auth.js";
 import env from "../lib/env.js";
 
+type UserPlan = "Hobby" | "Pro monthly" | "Pro yearly";
+
 const stripeRoutes = Router();
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 const PRODUCT_ID = env.STRIPE_PRODUCT_ID;
 const WEBHOOK_KEY = env.STRIPE_WEBHOOK_KEY;
-
-type UserPlan = "Hobby" | "Pro monthly" | "Pro yearly";
 
 
 // CHECKOUT
@@ -62,7 +62,7 @@ stripeRoutes.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Invalid checkout request" });
     }
 
-    return res.status(500).json({ error: `An unexptected error occured: `})
+    return res.status(500).json({ error: "Failed to establish checkout session" });
   }
 });
 
