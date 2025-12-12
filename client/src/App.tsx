@@ -12,6 +12,7 @@ import BillingPage from "./pages/main/billing";
 import GoalsPage from "./pages/main/goals";
 import ProfilePage from "./pages/main/profile";
 import NotFound from "./pages/not-found";
+import LandingPage from "./pages/landing";
 
 export default function App() {
   return (
@@ -23,7 +24,9 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<LandingPage />} />
+
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/new-goal" element={<NewGoalPage />} />
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/goals/:id" element={<Roadmap />} />

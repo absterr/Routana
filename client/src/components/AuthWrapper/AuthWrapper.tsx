@@ -10,7 +10,7 @@ const authRoutes = [
   "/signup",
   "/forgot-password",
   "/reset-password",
-]
+];
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -19,21 +19,29 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
   const session = data?.session;
   const user = data?.user ?? null;
-  const isAuthRoute = authRoutes.includes(pathname.replace(/\/$/, ""));
+  const plainPath = pathname.replace(/\/$/, "")
+  const isPricing = plainPath === "/pricing"
+
+  const isAuthRoute = authRoutes.includes(plainPath);
+  const isGuestRoute = isAuthRoute || plainPath === "";
+
   const hasSession = !!(session);
   const isLoading = isPending || (isRefetching && !data);
 
+  const notAuthenticated = !isGuestRoute && !hasSession && !isPricing;
+  const isAuthenticated = isGuestRoute && hasSession && !isPricing;
+
   useEffect(() => {
     if (isLoading) return;
-    if (!isAuthRoute && !hasSession) {
+    if (notAuthenticated) {
         navigate("/login", { replace: true });
         return;
       }
-    if (isAuthRoute && hasSession) {
-      navigate("/", { replace: true });
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
       return;
     }
-  }, [isLoading, isAuthRoute, hasSession, navigate]);
+  }, [isLoading, notAuthenticated, isAuthenticated, navigate]);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
