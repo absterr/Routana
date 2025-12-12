@@ -1,10 +1,12 @@
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { findEntry, type ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph, getStarredResource } from '@/lib/goals/goals-api';
 import type { RoadmapData } from '@/lib/goals/types';
+import { cn } from '@/lib/utils';
 import NotFound from '@/pages/not-found';
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import NodeDrawer from './NodeDrawer';
@@ -61,8 +63,9 @@ const RoadmapPage = () => {
   const entry = findEntry(selectedNode, roadmapJson);
   const starredUrls = Array.from(starredResources?.map((r) => r.url) || []);
 
-  return <section className='flex flex-col gap-y-2 items-center px-4 sm:px-6 lg:px-8 py-8'>
-    <div className='w-full max-w-2xl'>
+  return <section className='flex flex-col gap-y-2 items-center py-8'>
+    {/* px-4 sm:px-6 lg:px-8 */}
+    <div className='w-full max-w-2xl px-4 sm:px-8'>
       <div className='bg-white rounded-xl border border-gray-200 flex flex-col gap-y-10 py-6 px-8'>
         <Link to={"/goals"}
           className='text-gray-500 hover:text-black hover:underline transition-all duration-150 flex items-center gap-x-1'>
@@ -71,7 +74,7 @@ const RoadmapPage = () => {
         </Link>
 
         <div className='flex flex-col gap-y-3'>
-          <h2 className='text-xl sm:text-2xl md:text-3xl font-bold'>{roadmapTitle}</h2>
+          <h1 className='text-xl sm:text-2xl md:text-3xl font-bold tracking-tight'>{roadmapTitle}</h1>
           <p className='text-sm sm:text-base text-gray-600'>{roadmapDescription}</p>
         </div>
 
@@ -103,6 +106,39 @@ const RoadmapPage = () => {
       setOpen={setOpen}
       entry={entry}
     />
+
+    <div className='bg-white w-full flex flex-col items-center gap-y-12 pt-16 pb-24 px-4 sm:px-8 border-t border-neutral-200'>
+      <div className='w-full max-w-3xl flex flex-col gap-y-8'>
+        <h2 className='text-center sm:text-left font-semibold text-xl sm:text-2xl tracking-tight'>
+          Frequently asked questions
+        </h2>
+
+        <div className='flex flex-col gap-y-4'>
+          {roadmapJson.faqs.map((faq) => (
+            <Collapsible key={faq.id} className="bg-linear-to-br from-gray-50 to-gray-100 p-4 rounded-xl w-full border border-neutral-200">
+              <CollapsibleTrigger className="w-full flex justify-between items-center group">
+                <span className="font-semibold text-sm md:text-base">{faq.question}</span>
+                <div className="pt-0.5 px-1">
+                  <Plus className="w-5 group-aria-expanded:rotate-45 transition-transform duration-150" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent
+                className={cn(
+                  "pt-4 text-xs md:text-sm font-semibold text-neutral-600 overflow-hidden",
+                  "transition-all duration-150 ease-in-out",
+                  "data-[state=closed]:animate-collapsible-up",
+                  "data-[state=open]:animate-collapsible-down"
+                )}
+              >
+                {faq.answer}
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      </div>
+
+      <p className='text-xs text-center'>Lock in, bruv. GGs.</p>
+    </div>
   </section>
 };
 

@@ -4,7 +4,7 @@ import { createNewGoal } from "@/lib/goals/goals-api"
 import { newGoalSchema } from "@/lib/goals/goals-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { ArrowRight, BookCopy, ChartNoAxesCombined, Goal } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
@@ -34,24 +34,6 @@ const entries: Entry[] = [
   },
 ]
 
-const features = [
-  {
-    icon: Goal,
-    title: "Personalized Path",
-    description: "Get a structured roadmap tailored to your goal and experience level",
-  },
-  {
-    icon: BookCopy,
-    title: "Curated Resources",
-    description: "Access hand-picked courses, tutorials, and tools for each milestone",
-  },
-  {
-    icon: ChartNoAxesCombined,
-    title: "Progress Tracking",
-    description: "Monitor your growth and stay motivated with visual progress indicators",
-  },
-]
-
 const NewGoalPage = () => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof newGoalSchema>>({
@@ -75,10 +57,10 @@ const NewGoalPage = () => {
   }
 
   return (
-    <section className="flex flex-col items-center px-4 py-12">
+    <section className="flex flex-col items-center px-4 pt-12 pb-24">
       <div className="w-full max-w-3xl">
         <header className="text-center pb-8 sm:pb-4">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 text-balance pb-4 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 text-balance py-4 tracking-tight">
             What do you want to learn?
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 text-balance">
@@ -151,19 +133,10 @@ const NewGoalPage = () => {
               </Button>
             </div>
           </form>
-        </div>
 
-        <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="p-6 rounded-xl bg-white border border-gray-300 space-y-3"
-            >
-              <Icon className="w-7 h-7" />
-              <h3 className="font-semibold text-gray-900">{title}</h3>
-              <p className="text-sm text-gray-600">{description}</p>
-            </div>
-          ))}
+          {isPending && <p className=" text-center text-sm text-gray-500 pt-4">
+            Generating a roadmap takes a few minutes. Please wait...
+          </p>}
         </div>
       </div>
     </section>

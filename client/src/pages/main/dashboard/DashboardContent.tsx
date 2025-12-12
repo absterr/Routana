@@ -60,10 +60,13 @@ const DashboardContent = () => {
 
       <div className="pb-16">
         <div className="w-full flex justify-between items-center pb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
           {activeGoals.length !== 0 &&
             <Link to={"/new-goal"}>
-              <Button className="bg-purple-600 text-white font-semibold hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-2 cursor-pointer">
+              <Button
+                size={"sm"}
+                className="bg-purple-600 text-white text-xs sm:text-sm font-semibold hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-2 cursor-pointer"
+              >
                 <Plus className="w-5 h-5" />
                 New Goal
               </Button>
@@ -107,7 +110,7 @@ const DashboardContent = () => {
               {activeGoals.map((goal, i) => (
                 <div key={goal.id} className="px-6">
                   <div className={cn("py-4 border-gray-200",
-                    { "border-b": i !== activeGoals.length - 1 }
+                    {"border-b": i !== activeGoals.length - 1}
                   )}>
                     <GoalPreview goal={goal} />
                   </div>
