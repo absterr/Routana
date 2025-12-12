@@ -2,6 +2,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { findEntry, type ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph, getStarredResource } from '@/lib/goals/goals-api';
 import type { RoadmapData } from '@/lib/goals/types';
+import NotFound from '@/pages/not-found';
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
@@ -32,11 +33,18 @@ const RoadmapPage = () => {
     queryFn: () => getStarredResource(id!)
   });
 
+  if (!id || !/^[0-9a-fA-F-]{36}$/.test(id)) {
+    return <NotFound />
+  }
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
       <LoadingSpinner size={8} />
     </div>
   }
+
+  if (!roadmapData) return null;
+
   if (error) {
     return <div
       className='min-h-screen flex items-center justify-center text-red-600 font-semibold text-2xl'>
@@ -44,14 +52,7 @@ const RoadmapPage = () => {
     </div>;
   }
 
-  if (!roadmapData || !id) return null;
 
-  if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-    return <div
-      className='min-h-screen flex items-center justify-center font-semibold text-2xl'>
-      Page not found
-    </div>;
-  }
 
   const { roadmapJson, ...rest } = roadmapData;
   const roadmapTitle = roadmapJson.meta.title;

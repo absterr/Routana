@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import DashboardContent from "./DashboardContent";
-import { cn } from "@/lib/utils";
 
 const DashboardSkeleton = () => (
   <div className="">
@@ -53,7 +53,7 @@ const ErrorFallback = ({ resetErrorBoundary }: { resetErrorBoundary: () => void 
   <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
     <div className="text-red-600 font-semibold text-xl">Error loading dashboard</div>
     <Button
-      className="rounded-lg"
+      className="rounded-lg shadow-none"
       onClick={resetErrorBoundary}
       variant="outline"
     >
