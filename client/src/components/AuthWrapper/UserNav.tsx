@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/lib/auth/auth-client";
 import { useAuth } from "@/lib/auth/useAuth";
+import { CircleUserRound, CreditCard, LogOut } from "lucide-react";
 import { useTransition } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -68,18 +69,21 @@ if (!user) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link to={"/profile"}>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="py-2.5">
+              <CircleUserRound />
               Profile
             </DropdownMenuItem>
           </Link>
           <Link to={"/billing"}>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="py-2.5">
+              <CreditCard />
               Billing
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled={pending} onClick={handleLogOut}>
+        <DropdownMenuItem disabled={pending} onClick={handleLogOut} className="py-2.5">
+          <LogOut />
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

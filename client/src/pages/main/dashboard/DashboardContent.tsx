@@ -74,7 +74,7 @@ const DashboardContent = () => {
           }
         </div>
         {activeGoals.length === 0 ? (
-          <div className="py-12 sm:py-16 space-y-4 px-4 flex flex-col items-center gap-1">
+          <div className="py-18 px-4 flex flex-col items-center gap-5">
             <Rocket className="w-9 h-9" />
             <div className="text-center pb-2">
               <h3 className="text-xl sm:text-2xl font-bold text-balance">
