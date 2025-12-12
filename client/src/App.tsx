@@ -8,11 +8,12 @@ import ForgotPasswordPage from "./pages/auth/forgot-password";
 import LoginPage from "./pages/auth/login";
 import ResetPasswordPage from "./pages/auth/reset-password";
 import SignupPage from "./pages/auth/signup";
+import LandingPage from "./pages/landing";
 import BillingPage from "./pages/main/billing";
 import GoalsPage from "./pages/main/goals";
 import ProfilePage from "./pages/main/profile";
 import NotFound from "./pages/not-found";
-import LandingPage from "./pages/landing";
+import PricingPage from "./pages/pricing";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           <Route path="/" element={<LandingPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
 
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/new-goal" element={<NewGoalPage />} />
