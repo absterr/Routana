@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth/useAuth";
 import { cn } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import type { JSX } from "react";
@@ -43,6 +44,9 @@ const plans: Plan[] = [
 ];
 
 const PricingCard = () => {
+  const { user } = useAuth()
+  const isLoggedIn = user !== null;
+
   return (
     <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch">
       {plans.map((plan) => (
@@ -70,7 +74,12 @@ const PricingCard = () => {
           </div>
 
           <div className={cn("mt-auto", plan.title === "Pro" ? "pt-24" : "pt-1.5")}>
-            <Link to={"/signup"}>
+            <Link
+              to={isLoggedIn ?
+                plan.title === "Pro" ?
+                "/billing" : "/dashboard"
+                : "/signup"
+              }>
               <Button className={`w-full rounded-xl py-6 shadow-none cursor-pointer font-semibold ${plan.btnClass}`}>
                 {plan.title === "Hobby" ? "Join for free" : "Get started"}
               </Button>
