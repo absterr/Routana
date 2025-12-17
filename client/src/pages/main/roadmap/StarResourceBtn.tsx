@@ -1,5 +1,5 @@
-import { toggleStarredResource } from '@/lib/goals/goals-api';
-import { resourceTypeIcons } from '@/lib/goals/types';
+import { toggleStarredResource } from '@/lib/app/app-api';
+import { resourceTypeIcons } from '@/lib/app/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
 import { useState } from "react";
@@ -40,6 +40,7 @@ const StarResourceBtn = ({ goalId, resource, isStarred }: {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['starred', goalId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
     }
   });
 

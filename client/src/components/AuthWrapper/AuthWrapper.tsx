@@ -44,7 +44,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [isLoading, notAuthenticated, isAuthenticated, navigate]);
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-[95vh] flex items-center justify-center">
       <LoadingSpinner size={8} />
     </div>
   }

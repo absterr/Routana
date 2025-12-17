@@ -1,8 +1,8 @@
 import columns from "@/components/CustomTable/Columns";
 import GoalsTable from "@/components/CustomTable/GoalsTable";
 import { Button } from "@/components/ui/button";
-import { getAllGoals } from "@/lib/goals/goals-api";
-import type { Goal } from "@/lib/goals/types";
+import { getAllGoals } from "@/lib/app/app-api";
+import type { Goal } from "@/lib/app/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, Rocket } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ const GoalsContent = () => {
   const { data: userGoals } = useSuspenseQuery<Goal[], Error>({
     queryKey: ['allGoals'],
     queryFn: getAllGoals,
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 

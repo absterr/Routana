@@ -16,8 +16,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import type { findEntry } from '@/lib/ELK';
-import { updateNodeStatus } from '@/lib/goals/goals-api';
-import type { RoadmapData } from '@/lib/goals/types';
+import { updateNodeStatus } from '@/lib/app/app-api';
+import type { RoadmapData } from '@/lib/app/types';
 import { updateStatus } from '@/lib/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, X } from 'lucide-react';
@@ -64,6 +64,7 @@ const NodeDrawer = ({ goalId, starredUrls, isOpen, setOpen, entry }: NodeDrawerP
         };
       });
 
+      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
       toast.dismiss();
       toast.success("Status updated");
     },

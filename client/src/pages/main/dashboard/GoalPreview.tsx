@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { type DashboardGoal, resourceTypeIcons } from "@/lib/goals/types";
+import { type DashboardGoal, resourceTypeIcons } from "@/lib/app/types";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";

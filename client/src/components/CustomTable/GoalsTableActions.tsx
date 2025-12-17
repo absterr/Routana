@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { deleteGoals, updateGoalStatus } from "@/lib/goals/goals-api";
-import type { Goal } from "@/lib/goals/types";
+import { deleteGoals, updateGoalStatus } from "@/lib/app/app-api";
+import type { Goal } from "@/lib/app/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
 import { CheckCircle2, MoreHorizontal, Trash2 } from "lucide-react";
@@ -41,6 +41,7 @@ export default function GoalsTableActions<TData>({
     mutationFn: deleteGoals,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
       table.resetRowSelection();
       toast.success("Successfully deleted selected goals");
     },

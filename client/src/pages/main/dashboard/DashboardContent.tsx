@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
-import { getDashboardGoals } from "@/lib/goals/goals-api"
-import type { DashboardGoal } from "@/lib/goals/types"
+import { getDashboardGoals } from "@/lib/app/app-api"
+import type { DashboardGoal } from "@/lib/app/types"
 import { cn } from "@/lib/utils"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { ArrowLeft, Plus, Rocket } from "lucide-react"
@@ -11,6 +11,7 @@ const DashboardContent = () => {
   const { data: dashboardGoals } = useSuspenseQuery<DashboardGoal[], Error>({
     queryKey: ['dashboardGoals'],
     queryFn: getDashboardGoals,
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
@@ -58,10 +59,10 @@ const DashboardContent = () => {
         </div>
       </div>
 
-      <div className="pb-16">
+      <div className="pb-24">
         <div className="w-full flex justify-between items-center pb-4">
           <h2 className="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Active Goals</h2>
-          {activeGoals.length !== 0 &&
+          {dashboardGoals.length !== 0 &&
             <Link to={"/new-goal"}>
               <Button
                 size={"sm"}

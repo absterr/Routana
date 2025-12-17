@@ -9,7 +9,7 @@ import {
   uuid
 } from "drizzle-orm/pg-core";
 import z from "zod";
-import { roadmapSchema } from "../../goals/roadmap.schema.js";
+import { roadmapSchema } from "../../app/roadmap.schema.js";
 import { user } from "./auth.models.js";
 
 const phaseStatusEnum = pgEnum("phase_status", ["Active", "Pending", "Completed", "Skipped"]);

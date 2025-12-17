@@ -5,7 +5,7 @@ import { ElkNode } from "elkjs";
 import { Router } from "express";
 import { z } from "zod";
 import { db } from "../db/drizzle.js";
-import { goal, phase, roadmap, starredResource } from "../db/models/goal.models.js";
+import { goal, phase, roadmap, starredResource } from "../db/models/app.models.js";
 import { auth } from "../lib/auth.js";
 import env from "../lib/env.js";
 import { roadmapSchema } from "./roadmap.schema.js";

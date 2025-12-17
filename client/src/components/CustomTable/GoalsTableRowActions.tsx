@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { deleteGoals, updateGoalStatus } from "@/lib/goals/goals-api";
+import { deleteGoals, updateGoalStatus } from "@/lib/app/app-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -36,6 +36,7 @@ export default function GoalsTableRowActions({ id, currentStatus }: {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
       toast.dismiss();
       toast.success("Status updated.");
     },

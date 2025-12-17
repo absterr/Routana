@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const LandingPage = () => (
   <>
-    <section className="px-8 flex flex-col items-center justify-center">
+    <section className="px-8 flex flex-col items-center justify-center pb-8">
       <div
         className="flex flex-col items-center text-center max-w-sm md:max-w-lg lg:max-w-4xl min-h-[90vh]"
         id="hero"
@@ -38,7 +38,7 @@ const LandingPage = () => (
           </Link>
         </div>
 
-        <p className="pt-24 text-gray-400 text-xs sm:text-sm font-semibold" >
+        <p className="pt-24 text-gray-400 text-xs sm:text-sm font-semibold">
           Powered by intelligent learning models and real-world skill data.
         </p>
       </div>

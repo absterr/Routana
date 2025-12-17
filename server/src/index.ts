@@ -2,7 +2,7 @@ import { toNodeHandler } from "better-auth/node";
 import express from "express";
 import http from "http";
 import path from "path";
-import goalRoutes from "./goals/goal.controllers.js";
+import goalRoutes from "./app/app.controllers.js";
 import { auth } from "./lib/auth.js";
 import env from "./lib/env.js";
 import stripeRoutes from "./user/stripe.controllers.js";
@@ -15,7 +15,7 @@ const app = express();
 app.use("/api/auth", toNodeHandler(auth))
 
 app.use(express.json());
-app.use("/api", goalRoutes);
+app.use("/api/app", goalRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/stripe", stripeRoutes);
 

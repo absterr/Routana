@@ -1,7 +1,9 @@
 import CustomError from "../CustomError";
 
+const STRIPE_ROUTE = "/api/stripe";
+
 export const checkout = async (interval: "month" | "year") => {
-  const res = await fetch("/api/stripe/checkout", {
+  const res = await fetch(`${STRIPE_ROUTE}/checkout`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -19,7 +21,7 @@ export const checkout = async (interval: "month" | "year") => {
 }
 
 export const cancel = async () => {
-  const res = await fetch("/api/stripe/cancel", {
+  const res = await fetch(`${STRIPE_ROUTE}/cancel`, {
     method: "POST",
     credentials: "include",
     headers: {

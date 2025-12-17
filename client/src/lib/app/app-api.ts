@@ -2,6 +2,8 @@ import { z } from "zod";
 import CustomError from "../CustomError";
 import type { newGoalSchema } from "./goals-schema";
 
+const APP_ROUTE = "/api/app";
+
 interface ResourceDetails {
   goalId: string;
   type: "Video" | "Article" | "Course" | "Documentation" | "Interactive"
@@ -20,7 +22,7 @@ interface NodeDetails {
 
 // GET
 export const getDashboardGoals = async () => {
-  const res = await fetch("/api/dashboard", {
+  const res = await fetch(`${APP_ROUTE}/dashboard`, {
     method: "GET",
     credentials: "include"
   });
@@ -34,7 +36,7 @@ export const getDashboardGoals = async () => {
 };
 
 export const getAllGoals = async () => {
-  const res = await fetch("/api/goals", {
+  const res = await fetch(`${APP_ROUTE}/goals`, {
     method: "GET",
     credentials: "include"
   });
@@ -52,7 +54,7 @@ export const getRoadmapGraph = async (goalId: string) => {
     throw new Error("Invalid goal ID");
   }
 
-  const res = await fetch(`/api/roadmap/${goalId}`, {
+  const res = await fetch(`${APP_ROUTE}/roadmap/${goalId}`, {
     method: "GET",
     credentials: "include"
   });
@@ -68,7 +70,7 @@ export const getStarredResource = async (goalId: string) => {
     throw new Error("Invalid goal ID");
   }
 
-  const res = await fetch(`/api/resources/${goalId}`, {
+  const res = await fetch(`${APP_ROUTE}/resources/${goalId}`, {
     method: "GET",
     credentials: "include"
   });
@@ -82,7 +84,7 @@ export const getStarredResource = async (goalId: string) => {
 
 // POST
 export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
-  const res = await fetch("/api/new-goal", {
+  const res = await fetch(`${APP_ROUTE}/new-goal`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -106,7 +108,7 @@ export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails
     throw new Error("Invalid goal ID");
   }
 
-  const res = await fetch(`/api/resources/${goalId}`, {
+  const res = await fetch(`${APP_ROUTE}/resources/${goalId}`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -129,7 +131,7 @@ export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
     throw new Error("Invalid goal ID");
   }
 
-  const res = await fetch(`/api/roadmap/${goalId}`, {
+  const res = await fetch(`${APP_ROUTE}/roadmap/${goalId}`, {
     method: "PATCH",
     credentials: "include",
     headers: {
@@ -150,7 +152,7 @@ export const updateGoalStatus = async (goalsDetails: {
   goalIds: string[],
   newStatus: "Active" | "Completed" | "Pending"
 }) => {
-  const res = await fetch("/api/goals", {
+  const res = await fetch(`${APP_ROUTE}/goals`, {
     method: "PATCH",
     credentials: "include",
     headers: {
@@ -170,7 +172,7 @@ export const updateGoalStatus = async (goalsDetails: {
 
 // DELETE
 export const deleteGoals = async (goalIds: string[]) => {
-  const res = await fetch("/api/goals", {
+  const res = await fetch(`${APP_ROUTE}/goals`, {
     method: "DELETE",
     credentials: "include",
     headers: {

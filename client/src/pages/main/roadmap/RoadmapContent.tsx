@@ -1,7 +1,7 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { findEntry, type ELKNode } from '@/lib/ELK';
-import { getRoadmapGraph, getStarredResource } from '@/lib/goals/goals-api';
-import type { RoadmapData } from "@/lib/goals/types";
+import { getRoadmapGraph, getStarredResource } from '@/lib/app/app-api';
+import type { RoadmapData } from "@/lib/app/types";
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -23,6 +23,7 @@ const RoadmapContent = ({ id }: { id: string }) => {
   const { data: roadmapData } = useSuspenseQuery<RoadmapData, Error>({
     queryKey: ['roadmap', id],
     queryFn: () => getRoadmapGraph(id),
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false
   });
 

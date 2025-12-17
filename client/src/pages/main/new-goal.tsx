@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { createNewGoal } from "@/lib/goals/goals-api"
-import { newGoalSchema } from "@/lib/goals/goals-schema"
+import { createNewGoal } from "@/lib/app/app-api"
+import { newGoalSchema } from "@/lib/app/goals-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
-import { ArrowRight } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { ArrowRight, CircleAlert } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
@@ -36,6 +36,7 @@ const entries: Entry[] = [
 
 const NewGoalPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof newGoalSchema>>({
     resolver: zodResolver(newGoalSchema),
     defaultValues: {
@@ -46,7 +47,11 @@ const NewGoalPage = () => {
 
   const { isPending, mutate } = useMutation({
     mutationFn: createNewGoal,
-    onSuccess: (data) => navigate(`/goals/${data.goalId}`),
+    onSuccess: (data) => {
+      navigate(`/goals/${data.goalId}`);
+      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
+    },
     onError: (err) => toast.error("Couldn't create goal roadmap", {
       description: err.message
     }),
@@ -75,7 +80,10 @@ const NewGoalPage = () => {
                 <div className="flex justify-between pb-1">
                   <label className="text-sm font-semibold text-gray-900">{entry.label}</label>
                   {form.formState.errors[entry.name] && (
-                    <p className="text-red-600 text-sm">{form.formState.errors[entry.name]?.message as string}</p>
+                    <p className="text-red-600 text-sm">
+                      <CircleAlert size={14} className="inline pr-1" />
+                      {form.formState.errors[entry.name]?.message as string}
+                    </p>
                   )}
                 </div>
 

@@ -1,7 +1,9 @@
 import CustomError from "../CustomError";
 
+const USER_ROUTE = "/api/user";
+
 export const updateUsername = async (newName: string) => {
-  const res = await fetch("/api/user/name", {
+  const res = await fetch(`${USER_ROUTE}/name`, {
     method: "PATCH",
     credentials: "include",
     headers: {
@@ -19,7 +21,7 @@ export const updateUsername = async (newName: string) => {
 }
 
 export const deleteUserAccount = async () => {
-  const res = await fetch("/api/user/delete", {
+  const res = await fetch(`${USER_ROUTE}/delete`, {
     method: "DELETE",
     credentials: "include",
     headers: {

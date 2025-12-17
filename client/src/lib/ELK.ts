@@ -1,4 +1,4 @@
-import type { roadmapSchema } from "./goals/goals-schema";
+import type { roadmapSchema } from "./app/goals-schema";
 import { z } from "zod";
 
 export type ELKEdge = {
