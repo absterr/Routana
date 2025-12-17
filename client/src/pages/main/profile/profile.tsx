@@ -10,7 +10,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth/useAuth";
-import { deleteUserAccount } from "@/lib/user/user-api";
+import { deleteUser } from "@/lib/user/user-api";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ const ProfilePage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { isPending, mutate } = useMutation({
-    mutationFn: deleteUserAccount,
+    mutationFn: deleteUser,
     onSuccess: () => navigate("/login", { replace: true }),
     onError: () => toast.error("Unable to delete account")
   });
