@@ -1,8 +1,6 @@
 import { z } from "zod";
-import CustomError from "../CustomError";
+import { queryAPI, routes } from "../api";
 import type { newGoalSchema } from "./goals-schema";
-
-const APP_ROUTE = "/api/app";
 
 interface ResourceDetails {
   goalId: string;
@@ -19,152 +17,81 @@ interface NodeDetails {
   newStatus: "Pending" | "Active" | "Completed" | "Skipped";
 }
 
+const validateGoalUUID = (goalId: string) => {
+  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
+    throw new Error("Invalid goal ID");
+  }
+};
+
 
 // GET
 export const getDashboardGoals = async () => {
-  const res = await fetch(`${APP_ROUTE}/dashboard`, {
-    method: "GET",
-    credentials: "include"
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to load dashboard", res.status);
-  }
-
+  const data = await queryAPI(`${routes.app}/dashboard`)
   return data.goals ?? [];
-};
+}
 
 export const getAllGoals = async () => {
-  const res = await fetch(`${APP_ROUTE}/goals`, {
-    method: "GET",
-    credentials: "include"
-  });
-
- const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to get goals", res.status);
-  }
-
+  const data = await queryAPI(`${routes.app}/goals`);
   return data.goals ?? [];
 }
 
 export const getRoadmapGraph = async (goalId: string) => {
-  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
-    throw new Error("Invalid goal ID");
-  }
+  validateGoalUUID(goalId);
 
-  const res = await fetch(`${APP_ROUTE}/roadmap/${goalId}`, {
-    method: "GET",
-    credentials: "include"
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) throw new CustomError(data.error || "Unable to get roadmap layout", res.status);
+  const data = await queryAPI(`${routes.app}/roadmap/${goalId}`)
   return data ?? {};
-};
+}
 
-export const getStarredResource = async (goalId: string) => {
-  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
-    throw new Error("Invalid goal ID");
-  }
+export const getStarredResources = async (goalId: string) => {
+  validateGoalUUID(goalId);
 
-  const res = await fetch(`${APP_ROUTE}/resources/${goalId}`, {
-    method: "GET",
-    credentials: "include"
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) throw new CustomError(data.error || "Failed to get favourite resources", res.status);
+  const data = await queryAPI(`${routes.app}/resources/${goalId}`);
   return data.starredResources ?? [];
 };
 
 
 // POST
 export const createNewGoal = async (goalDetails: z.infer<typeof newGoalSchema>) => {
-  const res = await fetch(`${APP_ROUTE}/new-goal`, {
+  const data = await queryAPI(`${routes.app}/new-goal`, {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
     body: JSON.stringify(goalDetails)
   });
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Failed to generate roadmap", res.status);
-  }
-
-  return {
-    goalId: data.goalId ?? ""
-  }
+  return { goalId: data.goalId ?? "" };
 };
 
 export const toggleStarredResource = async ({ goalId, ...rest }: ResourceDetails) => {
-  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
-    throw new Error("Invalid goal ID");
-  }
+  validateGoalUUID(goalId);
 
-  const res = await fetch(`${APP_ROUTE}/resources/${goalId}`, {
+  const data = await queryAPI(`${routes.app}/resources/${goalId}`, {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
     body: JSON.stringify(rest)
   });
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to add resource to favourites", res.status);
-  }
-
   return data.success;
 };
+
 
 // PUT | PATCH
 export const updateNodeStatus = async ({ goalId, ...rest }: NodeDetails) => {
-  if (!/^[0-9a-fA-F-]{36}$/.test(goalId)) {
-    throw new Error("Invalid goal ID");
-  }
+  validateGoalUUID(goalId);
 
-  const res = await fetch(`${APP_ROUTE}/roadmap/${goalId}`, {
+  const data = await queryAPI(`${routes.app}/roadmap/${goalId}`, {
     method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
     body: JSON.stringify(rest)
   });
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to change node status", res.status);
-  }
-
   return data.success;
-};
+}
 
 export const updateGoalStatus = async (goalsDetails: {
   goalIds: string[],
   newStatus: "Active" | "Completed" | "Pending"
 }) => {
-  const res = await fetch(`${APP_ROUTE}/goals`, {
+  const data = await queryAPI(`${routes.app}/goals`, {
     method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
     body: JSON.stringify(goalsDetails)
   });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to update goals' status", res.status);
-  }
 
   return data.success;
 };
@@ -172,19 +99,10 @@ export const updateGoalStatus = async (goalsDetails: {
 
 // DELETE
 export const deleteGoals = async (goalIds: string[]) => {
-  const res = await fetch(`${APP_ROUTE}/goals`, {
+  const data = await queryAPI(`${routes.app}/goals`, {
     method: "DELETE",
-    credentials: "include",
-    headers: {
-      "Content-type": "application/json"
-    },
     body: JSON.stringify({ goalIds })
   });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new CustomError(data.error || "Unable to delete goal(s)", res.status);
-  }
 
   return data.success;
 };

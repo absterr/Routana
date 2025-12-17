@@ -1,6 +1,6 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { findEntry, type ELKNode } from '@/lib/ELK';
-import { getRoadmapGraph, getStarredResource } from '@/lib/app/app-api';
+import { getRoadmapGraph, getStarredResources } from '@/lib/app/app-api';
 import type { RoadmapData } from "@/lib/app/types";
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ const RoadmapContent = ({ id }: { id: string }) => {
 
   const { data: starredResources } = useSuspenseQuery<StarredResource[]>({
     queryKey: ['starred', id],
-    queryFn: () => getStarredResource(id),
+    queryFn: () => getStarredResources(id),
   });
 
   const { roadmapJson, ...rest } = roadmapData;
