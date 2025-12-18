@@ -48,7 +48,7 @@ const NewGoalPage = () => {
   const { isPending, mutate } = useMutation({
     mutationFn: createNewGoal,
     onSuccess: (data) => {
-      navigate(`/goals/${data.goalId}`);
+      navigate(`/goals/${data.newGoal.id}`);
       queryClient.invalidateQueries({ queryKey: ["allGoals"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
     },

@@ -5,8 +5,8 @@ import {
   Play,
   Target
 } from "lucide-react";
-import type { ELKNode } from "../ELK";
 import type z from "zod";
+import type { ELKNode } from "../ELK";
 import type { roadmapSchema } from "./goals-schema";
 
 export const resourceTypeIcons = {
@@ -34,7 +34,7 @@ export interface DashboardGoal {
   timeframe: string;
   status: "Active" | "Pending" | "Completed";
   progress: number;
-}
+};
 
 export interface Goal {
   id: string;
@@ -44,8 +44,21 @@ export interface Goal {
 }
 
 export interface RoadmapData {
-  layout: ELKNode;
-  width: number;
-  height: number;
+  layout: {
+    layoutGraph: ELKNode;
+    width: number;
+    height: number;
+  },
   roadmapJson: z.infer<typeof roadmapSchema>;
+};
+
+export interface Resource {
+  type: "Video" | "Article" | "Course" | "Documentation" | "Interactive";
+  title: string;
+  url: string;
+  category: "Free" | "Paid";
+};
+
+export interface ResourceWithId extends Resource {
+  id: string;
 }

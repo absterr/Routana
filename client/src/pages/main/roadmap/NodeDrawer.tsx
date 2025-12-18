@@ -150,7 +150,8 @@ const NodeDrawer = ({ goalId, starredUrls, isOpen, setOpen, entry }: NodeDrawerP
                       <StarResourceBtn
                         key={r.id}
                         goalId={goalId}
-                        isStarred={starredUrls.includes(r.url)} resource={r}
+                        starred={starredUrls.includes(r.url)}
+                        roadmapResource={r}
                       />
                     )}
                   </ul>

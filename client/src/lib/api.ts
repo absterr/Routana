@@ -8,10 +8,10 @@ export const routes = {
   stripe: "/stripe"
 } as const;
 
-export const queryAPI = async (
+export const queryAPI = async <T = unknown>(
   path: string,
   options: RequestInit = {},
-) => {
+): Promise<T> => {
   const res = await fetch(`${rootAPI}${path}`, {
     credentials: "include",
     ...options,

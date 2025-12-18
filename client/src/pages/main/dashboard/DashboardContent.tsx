@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { getDashboardGoals } from "@/lib/app/app-api"
-import type { DashboardGoal } from "@/lib/app/types"
 import { cn } from "@/lib/utils"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { ArrowLeft, Plus, Rocket } from "lucide-react"
@@ -8,7 +7,7 @@ import { Link } from "react-router-dom"
 import GoalPreview from "./GoalPreview"
 
 const DashboardContent = () => {
-  const { data: dashboardGoals } = useSuspenseQuery<DashboardGoal[], Error>({
+  const { data: dashboardGoals } = useSuspenseQuery({
     queryKey: ['dashboardGoals'],
     queryFn: getDashboardGoals,
     staleTime: 1000 * 60 * 5,

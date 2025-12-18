@@ -1,7 +1,6 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { findEntry, type ELKNode } from '@/lib/ELK';
 import { getRoadmapGraph, getStarredResources } from '@/lib/app/app-api';
-import type { RoadmapData } from "@/lib/app/types";
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -10,29 +9,24 @@ import { Link } from 'react-router-dom';
 import NodeDrawer from './NodeDrawer';
 import SVG from './SVG';
 
-interface StarredResource {
-  id: string;
-  title: string;
-  url: string;
-}
 
 const RoadmapContent = ({ id }: { id: string }) => {
   const [selectedNode, setSelectedNode] = useState<ELKNode | null>(null);
   const [isOpen, setOpen] = useState(false);
 
-  const { data: roadmapData } = useSuspenseQuery<RoadmapData, Error>({
+  const { data: roadmapData } = useSuspenseQuery({
     queryKey: ['roadmap', id],
     queryFn: () => getRoadmapGraph(id),
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false
   });
 
-  const { data: starredResources } = useSuspenseQuery<StarredResource[]>({
-    queryKey: ['starred', id],
+  const { data: starredResources } = useSuspenseQuery({
+    queryKey: ['starredResources', id],
     queryFn: () => getStarredResources(id),
   });
 
-  const { roadmapJson, ...rest } = roadmapData;
+  const { roadmapJson, layout } = roadmapData;
   const roadmapTitle = roadmapJson.meta.title;
   const roadmapDescription = roadmapJson.meta.userContext.notes;
   const currentProgress = roadmapJson.progress;
@@ -69,7 +63,7 @@ const RoadmapContent = ({ id }: { id: string }) => {
         </div>
       </div>
 
-      <SVG roadmapData={rest}
+      <SVG layout={layout}
         onNodeClick={(n) => {
           setSelectedNode(n);
           setOpen(true);

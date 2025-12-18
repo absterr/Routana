@@ -1,5 +1,5 @@
 import type z from "zod";
-import type { roadmapSchema } from "./goals/goals-schema";
+import type { roadmapSchema } from "./app/goals-schema";
 
 type RoadmapJSON = z.infer<typeof roadmapSchema>;
 type Phase = RoadmapJSON["phases"][number];
