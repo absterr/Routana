@@ -2,7 +2,7 @@ import ELK, { ElkNode } from "elkjs";
 
 const elk = new ELK();
 
-export const layoutGraph = async (elkGraph: ElkNode, options: Record<string, string> = {}) => {
+export const getLayoutGraph = async (elkGraph: ElkNode, options: Record<string, string> = {}) => {
   const defaultOptions = {
     'elk.algorithm': 'layered',
     'elk.direction': 'DOWN',

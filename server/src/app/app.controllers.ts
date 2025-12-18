@@ -1,7 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { fromNodeHeaders } from "better-auth/node";
 import { and, count, eq, getTableColumns, inArray } from "drizzle-orm";
-import { ElkNode } from "elkjs";
 import { Router } from "express";
 import { z } from "zod";
 import { db } from "../db/drizzle.js";
@@ -9,9 +8,8 @@ import { goal, phase, roadmap, starredResource } from "../db/models/app.models.j
 import { auth } from "../lib/auth.js";
 import env from "../lib/env.js";
 import { roadmapSchema } from "./roadmap.schema.js";
-import { layoutGraph } from "./utils/elk.js";
-import { jsonToElk } from "./utils/jsonToElk.js";
 import { ROADMAP_SYSTEM_PROMPT, ROADMAP_USER_PROMPT } from "./utils/prompt.js";
+import getRoadmapLayout from "./utils/roadmapLayout.js";
 import updateStatus from "./utils/updateStatus.js";
 
 const goalRoutes = Router();
@@ -125,27 +123,9 @@ goalRoutes.get("/roadmap/:id", async (req, res) => {
       return res.status(404).json({ error: "Goal not found" });
     }
 
-    const elkGraph = jsonToElk(roadmapJson);
-    const layout = await layoutGraph(elkGraph);
+    const layout = await getRoadmapLayout(roadmapJson);
 
-    // Compute overall canvas size from layout children
-    let width = layout.width || 0;
-    let height = layout.height || 0;
-
-    layout.children?.forEach((c: ElkNode) => {
-      const cx = c.x ?? 0;
-      const cy = c.y ?? 0;
-      const cw = c.width ?? 0;
-      const ch = c.height ?? 0;
-
-      width = Math.max(width, cx + cw + 40)
-      height = Math.max(height, cy + ch + 40)
-    })
-
-    width += 40;
-    height += 40;
-
-    return res.status(200).json({ layout, width, height, roadmapJson });
+    return res.status(200).json({ layout, roadmapJson });
   } catch (err) {
     return res.status(500).json({ error: "Failed to get roadmap layout" });
   }
@@ -235,14 +215,14 @@ goalRoutes.post("/new-goal", async (req, res) => {
 
     const roadmapPhases = roadmapJson.phases;
 
-    const newGoalId = await db.transaction(async (tx) => {
+    const newGoalDetails = await db.transaction(async (tx) => {
       const [newGoal] = await tx
         .insert(goal)
         .values({
           ...goalDetails,
           userId: currentUserId
         })
-        .returning({ id: goal.id });
+        .returning(rest);
 
       await tx.insert(roadmap).values({
         userId: currentUserId,
@@ -250,21 +230,41 @@ goalRoutes.post("/new-goal", async (req, res) => {
         roadmapJson
       });
 
+      const newPhases = [];
       for (let i = 0; i < roadmapPhases.length; i++) {
         const p = roadmapPhases[i];
-        await tx.insert(phase).values({
+        const [newPhase] = await tx.insert(phase).values({
           id: p.id,
           goalId: newGoal.id,
           title: p.title,
           status: p.status,
           orderIndex: i
+        })
+        .returning({
+          title: phase.title,
+          status: phase.status,
+          orderIndex: phase.orderIndex,
         });
+
+        newPhases.push(newPhase);
       }
 
-      return newGoal.id;
+      const newGoalDetails = {
+        ...newGoal,
+        phases: newPhases,
+        resources: []
+      }
+
+      return newGoalDetails;
     });
 
-    return res.status(201).json({ goalId: newGoalId });
+    const layout = await getRoadmapLayout(roadmapJson);
+
+    return res.status(201).json({
+      newGoal: newGoalDetails,
+      roadmapJson,
+      layout,
+    });
   } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });
@@ -292,34 +292,45 @@ goalRoutes.post("/resources/:id", async (req, res) => {
     title: z.string(),
     url: z.string(),
     category: z.enum(["Free", "Paid"]),
-    starred: z.boolean()
+    isStarred: z.boolean()
   });
 
   try {
-    const { type, title, url, category, starred } = resourceSchema.parse(req.body);
+    const { isStarred, ...rest } = resourceSchema.parse(req.body);
 
     const [existing] = await db.select()
       .from(starredResource)
-      .where(and(eq(starredResource.goalId, currentGoalId), eq(starredResource.url, url)))
+      .where(and(eq(starredResource.goalId, currentGoalId), eq(starredResource.url, rest.url)))
       .limit(1)
 
+    let resourceId = existing.id ?? "";
     if (existing) {
-      if (!starred) {
-        await db.delete(starredResource).where(eq(starredResource.id, existing.id));
+      if (!isStarred) {
+        const [unstarred] = await db
+          .delete(starredResource)
+          .where(eq(starredResource.id, existing.id))
+          .returning({ id: starredResource.id });
+
+        resourceId = unstarred.id;
       }
     } else {
-      if (starred) {
-        await db.insert(starredResource).values({
-          goalId: currentGoalId,
-          type,
-          title,
-          url,
-          category
-        });
+      if (isStarred) {
+        const [starred] = await db.insert(starredResource)
+          .values({
+            goalId: currentGoalId,
+            ...rest
+          }).returning({ id: starredResource.id });
+
+        resourceId = starred.id;
       }
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({
+      resource: {
+        id: resourceId,
+        ...rest
+      }
+    });
   } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });
@@ -355,7 +366,7 @@ goalRoutes.patch("/goals", async (req, res) => {
         inArray(goal.id, goalIds)
     ));
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ goalIds, newStatus });
   } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });
@@ -420,7 +431,7 @@ goalRoutes.patch("/roadmap/:id", async (req, res) => {
         .where(eq(goal.id, currentGoalId));
     });
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ newRoadmapJson });
   } catch (err: any) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });
