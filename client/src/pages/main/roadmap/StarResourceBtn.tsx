@@ -65,9 +65,9 @@ const StarResourceBtn = ({ goalId, roadmapResource, starred }: {
         if (item.id !== goalId) return item;
 
         const newResources = item.resources.filter((r) => !(r.url === data.url && !isStarred));
-        const resourceExists = newResources.find((r) => r.url === data.url);
+        const resourceExists = newResources.some((r) => r.url === data.url);
 
-        if (!resourceExists || isStarred) {
+        if (!resourceExists && isStarred) {
           const newStarredResource = {
             type: data.type,
             title: data.title,
