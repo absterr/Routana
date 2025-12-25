@@ -303,7 +303,7 @@ goalRoutes.post("/resources/:id", async (req, res) => {
       .where(and(eq(starredResource.goalId, currentGoalId), eq(starredResource.url, rest.url)))
       .limit(1)
 
-    let resourceId = existing.id ?? "";
+    let resourceId = "";
     if (existing) {
       if (!isStarred) {
         const [unstarred] = await db

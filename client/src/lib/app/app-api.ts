@@ -7,14 +7,9 @@ import type {
   Resource,
   ResourceWithId,
   RoadmapData,
+  StarredResource
 } from "./types";
 
-
-interface StarredResource {
-  id: string;
-  title: string;
-  url: string;
-};
 
 interface ResourceDetails extends Resource {
   goalId: string;

@@ -62,3 +62,9 @@ export interface Resource {
 export interface ResourceWithId extends Resource {
   id: string;
 }
+
+export interface StarredResource {
+  id: string;
+  title: string;
+  url: string;
+};

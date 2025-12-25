@@ -1,5 +1,9 @@
-import { toggleStarredResource } from '@/lib/app/app-api';
-import { resourceTypeIcons, type ResourceWithId } from '@/lib/app/types';
+import { getDashboardGoals, toggleStarredResource } from '@/lib/app/app-api';
+import {
+  resourceTypeIcons,
+  type ResourceWithId,
+  type StarredResource
+} from '@/lib/app/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
 import { useState } from "react";
@@ -30,9 +34,53 @@ const StarResourceBtn = ({ goalId, roadmapResource, starred }: {
     onError: (_, __, context) => {
       if (context) setStarred(context.previousState);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['starredResources', goalId] });
-      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
+    onSuccess: async (data) => {
+      if (!data) return;
+
+      queryClient.setQueryData<StarredResource[]>(["starredResources", goalId],
+        (oldData) => {
+          if (!oldData) return;
+          const starredExists = oldData.find((item) => item.url === data.url);
+          const newData = oldData.filter((r) => !(r.url === data.url && !isStarred));
+
+          if (!starredExists && isStarred) {
+            const newStarredResource = {
+              id: data.id,
+              title: data.title,
+              url: data.url,
+            };
+
+            newData.push(newStarredResource);
+          };
+
+          return newData;
+        });
+
+      const existingData = await queryClient.ensureQueryData({
+        queryKey: ["dashboardGoals"],
+        queryFn: getDashboardGoals,
+      });
+
+      const updatedDashboardData = existingData.map((item) => {
+        if (item.id !== goalId) return item;
+
+        const newResources = item.resources.filter((r) => !(r.url === data.url && !isStarred));
+        const resourceExists = newResources.find((r) => r.url === data.url);
+
+        if (!resourceExists || isStarred) {
+          const newStarredResource = {
+            type: data.type,
+            title: data.title,
+            url: data.url
+          };
+
+          newResources.push(newStarredResource);
+        }
+
+        return { ...item, resources: newResources };
+      });
+
+      queryClient.setQueryData(["dashboardGoals"], updatedDashboardData);
     }
   });
 
