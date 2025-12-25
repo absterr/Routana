@@ -50,7 +50,7 @@ if (!user) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full cursor-pointer">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.image ?? user.name} alt="user-image" />
             <AvatarFallback>SC</AvatarFallback>

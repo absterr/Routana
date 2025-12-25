@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { createNewGoal } from "@/lib/app/app-api"
+import { createNewGoal, getAllGoals, getDashboardGoals } from "@/lib/app/app-api"
 import { newGoalSchema } from "@/lib/app/goals-schema"
+import type { Goal, RoadmapData } from "@/lib/app/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, CircleAlert } from "lucide-react"
@@ -45,12 +46,43 @@ const NewGoalPage = () => {
     },
   })
 
+  const updateListCache = async <T extends { id: string }>(
+      fetchKey: string[],
+      fetchFn: () => Promise<T[]>,
+      newItem: T
+    ) => {
+      const existingData = await queryClient.ensureQueryData({
+        queryKey: fetchKey,
+        queryFn: fetchFn,
+      });
+
+      const exists = existingData.some((item) => item.id === newItem.id);
+
+      if (!exists)
+        queryClient.setQueryData(fetchKey, [...existingData, newItem]);
+    };
+
   const { isPending, mutate } = useMutation({
     mutationFn: createNewGoal,
-    onSuccess: (data) => {
-      navigate(`/goals/${data.newGoal.id}`);
-      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
+    onSuccess: async (data) => {
+      const newGoalId = data.newGoal.id;
+      const newRoadmapData: RoadmapData = {
+        layout: data.layout,
+        roadmapJson: data.roadmapJson
+      };
+
+      queryClient.setQueryData(["roadmap", newGoalId], newRoadmapData);
+      navigate(`/goals/${newGoalId}`);
+
+      const newGoal: Goal = {
+        id: data.newGoal.id,
+        title: data.newGoal.title,
+        description: data.newGoal.description,
+        status: data.newGoal.status
+      };
+
+      await updateListCache(["allGoals"], getAllGoals, newGoal)
+      await updateListCache(["dashboardGoals"], getDashboardGoals, data.newGoal);
     },
     onError: (err) => toast.error("Couldn't create goal roadmap", {
       description: err.message

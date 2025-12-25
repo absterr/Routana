@@ -39,7 +39,7 @@ export interface DashboardGoal {
 export interface Goal {
   id: string;
   title: string;
-  description: string | undefined;
+  description: string | null;
   status: "Active" | "Pending" | "Completed";
 }
 

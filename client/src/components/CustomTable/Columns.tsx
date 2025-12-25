@@ -1,5 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Goal } from "@/lib/goals/types";
+import type { Goal } from "@/lib/app/types";
 import { type ColumnDef } from "@tanstack/react-table";
 import GoalsTableColumnHeader from "./GoalsTableColumnHeader";
 import GoalsTableRowActions from "./GoalsTableRowActions";

@@ -17,8 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { findEntry } from '@/lib/ELK';
 import { updateNodeStatus } from '@/lib/app/app-api';
-import type { RoadmapData } from '@/lib/app/types';
-import { updateStatus } from '@/lib/helpers';
+import type { DashboardGoal, RoadmapData } from '@/lib/app/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, X } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
@@ -35,6 +34,7 @@ interface NodeDrawerProps {
 
 const NodeDrawer = ({ goalId, starredUrls, isOpen, setOpen, entry }: NodeDrawerProps) => {
   const queryClient = useQueryClient();
+
   const { isPending, mutate } = useMutation({
     mutationFn: ({ nodeId, newStatus }: {
       nodeId: string,
@@ -43,30 +43,40 @@ const NodeDrawer = ({ goalId, starredUrls, isOpen, setOpen, entry }: NodeDrawerP
     onMutate: () => {
       toast.loading("Updating status...");
     },
-    onSuccess: (_, vars) => {
-      const { nodeId, newStatus } = vars;
+    onSuccess: async (data) => {
       queryClient.setQueryData<RoadmapData>(['roadmap', goalId], (oldData) => {
-        if (!oldData) return oldData;
+        if (!oldData) return;
 
-        const updatedJson = updateStatus({
-          roadmapJson: oldData.roadmapJson,
-          nodeId,
-          newStatus
-        });
-
-        // UPDATE PROGRESS IF RETURNED FROM BACKEND
-        // if (data.progress !== undefined) {
-        //   updatedJson.progress = String(data.progress);
-        // }
         return {
           ...oldData,
-          roadmapJson: updatedJson
-        };
+          roadmapJson: data
+        }
       });
 
-      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
       toast.dismiss();
       toast.success("Status updated");
+
+      queryClient.setQueryData<DashboardGoal[]>(['dashboardGoals'], (oldData) => {
+        if (!oldData) return;
+
+        const updatedPhases = data.phases.map((phase, i) => ({
+          title: phase.title,
+          status: phase.status,
+          orderIndex: i
+        }))
+
+        const updatedData: DashboardGoal[] = oldData.map((goal) => {
+          if (goal.id === goalId)
+            return {
+              ...goal,
+              phases: updatedPhases,
+              progress: data.progress
+            }
+          return goal;
+        });
+
+        return updatedData;
+      });
     },
     onError: () => {
       toast.dismiss();

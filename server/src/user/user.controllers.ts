@@ -28,7 +28,7 @@ userRoutes.patch("/name", async (req, res) => {
       .set({ name: newName })
       .where(eq(user.id, currentUserId));
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ newName });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid user request" });

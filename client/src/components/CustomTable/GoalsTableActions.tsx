@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { deleteGoals, updateGoalStatus } from "@/lib/app/app-api";
+import { deleteGoals, getAllGoals, getDashboardGoals, updateGoalStatus } from "@/lib/app/app-api";
 import type { Goal } from "@/lib/app/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
@@ -37,11 +37,40 @@ export default function GoalsTableActions<TData>({
 
   const queryClient = useQueryClient();
 
+  const updateListCache = async <T extends {
+    id: string,
+    status: "Active" | "Pending" | "Completed"
+  }>(
+    fetchKey: string[],
+    fetchFn: () => Promise<T[]>,
+    goalIds: string[],
+    status?: T["status"]
+  ) => {
+    const existingData = await queryClient.ensureQueryData({
+      queryKey: fetchKey,
+      queryFn: fetchFn,
+    });
+
+    let updatedData;
+
+    if (status) {
+      updatedData = existingData.map((data) => (goalIds.includes(data.id) ? {
+        ...data,
+        status
+      } : data));
+    } else {
+      updatedData = existingData.filter((data) => !goalIds.includes(data.id));
+    }
+
+    queryClient.setQueryData(fetchKey, updatedData);
+  };
+
   const { mutate: deleteSelected, isPending: deletePending } = useMutation({
     mutationFn: deleteGoals,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
+    onSuccess: async (_, vars) => {
+      await updateListCache(["allGoals"], getAllGoals, vars);
+      await updateListCache(["dashboardGoals"], getDashboardGoals, vars);
+
       table.resetRowSelection();
       toast.success("Successfully deleted selected goals");
     },
@@ -55,8 +84,10 @@ export default function GoalsTableActions<TData>({
     onMutate: () => {
       toast.loading("Updating status...");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+    onSuccess: async (data) => {
+      await updateListCache(["allGoals"], getAllGoals, data.goalIds, data.newStatus);
+      await updateListCache(["dashboardGoals"], getDashboardGoals, data.goalIds, data.newStatus);
+
       toast.dismiss();
       toast.success("Status updated.");
     },

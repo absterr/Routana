@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { deleteGoals, updateGoalStatus } from "@/lib/app/app-api";
+import { deleteGoals, getAllGoals, getDashboardGoals, updateGoalStatus } from "@/lib/app/app-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -29,14 +29,43 @@ export default function GoalsTableRowActions({ id, currentStatus }: {
 }) {
   const queryClient = useQueryClient();
 
+  const updateListCache = async <T extends {
+    id: string,
+    status: "Active" | "Pending" | "Completed"
+  }>(
+    fetchKey: string[],
+    fetchFn: () => Promise<T[]>,
+    goalIds: string[],
+    status?: T["status"]
+  ) => {
+    const existingData = await queryClient.ensureQueryData({
+      queryKey: fetchKey,
+      queryFn: fetchFn,
+    });
+
+    let updatedData;
+
+    if (status) {
+      updatedData = existingData.map((data) => (goalIds.includes(data.id) ? {
+        ...data,
+        status
+      } : data));
+    } else {
+      updatedData = existingData.filter((data) => !goalIds.includes(data.id));
+    }
+
+    queryClient.setQueryData(fetchKey, updatedData);
+  };
+
   const { mutate: updateSelected, isPending: updatePending } = useMutation({
     mutationFn: updateGoalStatus,
     onMutate: () => {
       toast.loading("Updating status...");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboardGoals"] });
+    onSuccess: async (data) => {
+      await updateListCache(["allGoals"], getAllGoals, data.goalIds, data.newStatus);
+      await updateListCache(["dashboardGoals"], getDashboardGoals, data.goalIds, data.newStatus);
+
       toast.dismiss();
       toast.success("Status updated.");
     },
@@ -48,8 +77,10 @@ export default function GoalsTableRowActions({ id, currentStatus }: {
 
   const { mutate: deleteGoal, isPending: deletePending } = useMutation({
     mutationFn: deleteGoals,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allGoals"] });
+    onSuccess: async (_, vars) => {
+      await updateListCache(["allGoals"], getAllGoals, vars);
+      await updateListCache(["dashboardGoals"], getDashboardGoals, vars);
+
       toast.success("Successfully deleted selected goals");
     },
     onError: () => {

@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import NodeDrawer from './NodeDrawer';
 import SVG from './SVG';
 
-
 const RoadmapContent = ({ id }: { id: string }) => {
   const [selectedNode, setSelectedNode] = useState<ELKNode | null>(null);
   const [isOpen, setOpen] = useState(false);
