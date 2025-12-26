@@ -6,6 +6,7 @@ import goalRoutes from "./app/app.controllers.js";
 import { auth } from "./lib/auth.js";
 import env from "./lib/env.js";
 import stripeRoutes from "./user/stripe.controllers.js";
+import stripeWebhook from "./user/stripe.webhook.js";
 import userRoutes from "./user/user.controllers.js";
 
 const rootDir = path.resolve(process.cwd(), "..");
@@ -13,6 +14,7 @@ const PORT = env.PORT;
 const app = express();
 
 app.use("/api/auth", toNodeHandler(auth))
+app.use("/api/stripe", stripeWebhook);
 
 app.use(express.json());
 app.use("/api/app", goalRoutes);
