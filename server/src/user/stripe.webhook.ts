@@ -68,9 +68,9 @@ stripeWebhook.post("/webhook", raw({ type: "application/json" }), async (req, re
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             subscriptionStatus: subscription.status,
-            subscriptionExpiresAt: new Date(
-              (subscription.cancel_at ?? Date.now()) * 1000
-            ),
+            subscriptionExpiresAt: subscription.cancel_at
+              ? new Date(subscription.cancel_at * 1000)
+              : null
           })
           .where(eq(user.id, userId));
         break;
